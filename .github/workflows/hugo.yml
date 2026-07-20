@@ -23,12 +23,13 @@ jobs:
           extended: true
 
       - name: Build website
+        working-directory: ./fcj-workshop-template-blank
         run: hugo --minify
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./public
-          publish_branch: gh-pages 
-          force_orphan: true 
+          publish_dir: ./fcj-workshop-template-blank/public
+          publish_branch: gh-pages
+          force_orphan: true
