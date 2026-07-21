@@ -142,7 +142,7 @@ The system provides the following capabilities:
 
 + Monitor and trace the entire system in real time.
 
-![Workshop Result](/fcj-workshop/images/5-Workshop/5.9/5.9.2/workshop-result.png)
+![Workshop Result](/fcj-workshop/images/5-Workshop/5.9/workshop-result.png)
 
 ---
 
