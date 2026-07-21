@@ -1,28 +1,20 @@
 ---
 title: "Worklog Tuần 6"
-date: 2024-01-01
-weight: 1
+date: 2026-06-08
+weight: 6
 chapter: false
 pre: " <b> 1.6. </b> "
 ---
 
-{{% notice warning %}}
-⚠️ **Lưu ý:** Đây là bản mẫu (template) trống. Hãy tự điền nội dung thực tế của bạn vào các mục bên dưới.
-{{% /notice %}}
+### Mục tiêu:
 
-### Mục tiêu Tuần 6:
+* Kết nối DynamoDB
 
-* ...
-* ...
+### Công việc:
 
-### Công việc thực hiện trong tuần:
+* Thiết kế bảng Notes  
+* Kết nối Lambda  
 
-| Ngày | Công việc | Ngày bắt đầu | Ngày hoàn thành | Tài liệu tham khảo |
-| ---- | --------- | ------------ | ---------------- | ------------------- |
-|      |           |              |                   |                      |
-|      |           |              |                   |                      |
+### Kết quả:
 
-### Kết quả đạt được Tuần 6:
-
-* ...
-* ...
+* Lưu trữ dữ liệu thành công  

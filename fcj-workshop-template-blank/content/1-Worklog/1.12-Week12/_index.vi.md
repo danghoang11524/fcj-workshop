@@ -1,28 +1,22 @@
 ---
 title: "Worklog Tuần 12"
-date: 2024-01-01
-weight: 2
+date: 2026-07-20
+weight: 12
 chapter: false
-pre: " <b> 1.12 </b> "
+pre: " <b> 1.12. </b> "
 ---
 
-{{% notice warning %}}
-⚠️ **Lưu ý:** Đây là bản mẫu (template) trống. Hãy tự điền nội dung thực tế của bạn vào các mục bên dưới.
-{{% /notice %}}
+### Mục tiêu:
 
-### Mục tiêu Tuần 12:
+* Hoàn thiện & Demo
 
-* ...
-* ...
+### Công việc:
 
-### Công việc thực hiện trong tuần:
+* Demo hệ thống  
+* Báo cáo cuối kỳ  
 
-| Ngày | Công việc | Ngày bắt đầu | Ngày hoàn thành | Tài liệu tham khảo |
-| ---- | --------- | ------------ | ---------------- | ------------------- |
-|      |           |              |                   |                      |
-|      |           |              |                   |                      |
+### Kết quả:
 
-### Kết quả đạt được Tuần 12:
-
-* ...
-* ...
+* Hoàn thành project Smart Notes API  
+* Hiểu rõ kiến trúc serverless AWS  
+* Sẵn sàng đi làm thực tế  

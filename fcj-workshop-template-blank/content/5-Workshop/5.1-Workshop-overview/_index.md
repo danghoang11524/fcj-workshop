@@ -1,111 +1,126 @@
-```markdown id="intro51en"
 ---
 title : "Introduction"
-date : 2025-07-14
+date : 2026-07-21
 weight : 1
-chapter : true
+chapter : false
 pre : " <b> 5.1. </b> "
 ---
+Smart Notes API is a personal note management system built entirely on
+AWS Cloud using a **Serverless** architecture and **Clean
+Architecture**, eliminating the need to manage or operate any servers.
 
-# Introduction to Smart Campus Guardian
+The system provides the following features:
 
-Smart Campus Guardian is an intelligent campus incident monitoring system built entirely on AWS Cloud using a **Cloud Native** and **Event-Driven** architecture.
++ Create, view, update, and delete notes (CRUD).
++ Upload and remove images attached to notes.
++ Securely access images through temporary signed URLs (Presigned URLs) without exposing the S3 bucket publicly.
++ Restore deleted notes within three days (Recycle Bin), after which they are permanently removed automatically.
++ Recover the entire database table to any point within the previous 35 days using **Point-in-Time Recovery (PITR)**, protecting against accidental updates or deletions.
 
-The system leverages AWS AI services to automatically detect incidents such as:
-
-+ Fire or smoke on campus.
-+ A person falling or remaining motionless for an extended period.
-+ Unusual crowd gatherings.
-+ Unauthorized access to restricted areas.
-+ Camera connection failures.
-
-Once an incident is detected, the system automatically analyzes the level of risk, stores the incident information, sends alerts to the campus security team, and displays the results on the dashboard in real time.
+The entire infrastructure is defined using **AWS SAM**
+(**Infrastructure as Code**), making deployments repeatable and allowing
+all resources to be removed with a single command without manual
+configuration in the AWS Console. The build and deployment process is
+further automated through **CI/CD**, ensuring every code change is tested
+and deployed automatically without manually running deployment commands.
 
 ---
 
 #### Workshop Objectives
 
-In this workshop, you will deploy an intelligent monitoring system using AWS services.
+In this workshop, you will build and deploy a complete **end-to-end**
+Serverless REST API from scratch.
 
-After completing the workshop, you will be able to:
+After completing this workshop, you will be able to:
 
-+ Deploy a website using Amazon S3 and Amazon CloudFront.
-+ Build a serverless API with Amazon API Gateway and AWS Lambda.
-+ Store camera images in Amazon S3.
-+ Build an event-processing workflow using Amazon EventBridge and AWS Step Functions.
-+ Use Amazon Rekognition to detect objects in images.
-+ Use Amazon Bedrock to assess incident risk levels.
-+ Store incident data in Amazon DynamoDB.
-+ Send email and SMS alerts using Amazon SES and Amazon SNS.
-+ Monitor the entire system using Amazon CloudWatch.
++ Build a Serverless API using **Amazon API Gateway** and **AWS Lambda**.
++ Store note data in **Amazon DynamoDB**, using **Time-to-Live (TTL)** to automatically remove expired data.
++ Protect note data with **Amazon DynamoDB Point-in-Time Recovery (PITR)**, allowing recovery to any point within the previous 35 days.
++ Store and secure images in **Amazon S3** using a private bucket and Presigned URLs.
++ Manage the entire infrastructure using **AWS SAM / AWS CloudFormation** (Infrastructure as Code).
++ Apply the least-privilege principle using **AWS IAM**.
++ Monitor logs and distributed traces with **Amazon CloudWatch** and **AWS X-Ray**.
++ Test the API using **Jest**, **Postman**, and **curl**.
++ Automate build and deployment using **CI/CD** with **GitHub Actions**, eliminating manual deployment.
++ Optimize costs, apply basic security best practices, and properly clean up AWS resources.
 
 ---
 
 #### System Architecture Overview
 
-The Smart Campus Guardian architecture is divided into the following main components:
+The Smart Notes API architecture consists of the following main layers:
 
 + **Frontend Layer**  
-The website is hosted on **Amazon S3 Static Website Hosting** and delivered through **Amazon CloudFront** to improve performance and reduce latency.
-
-+ **Authentication Layer**  
-Users authenticate through **Amazon Cognito**, using JWT tokens to securely access the APIs.
+  A static web application (HTML/CSS/JavaScript) is served directly by
+  **AWS Lambda** using Express static middleware. The frontend calls the
+  API through the same domain, eliminating the need for Amazon S3 Static
+  Website Hosting or Amazon CloudFront in this workshop.
 
 + **Application Layer**  
-User requests are received by **Amazon API Gateway** and processed by **AWS Lambda**.
-
-+ **AI Processing Layer**  
-When a camera uploads an image to Amazon S3, the event triggers **Amazon EventBridge** and **AWS Step Functions** to orchestrate the AI processing workflow.
-
-+ **AI Analysis Layer**  
-Amazon Rekognition detects objects in the image, and Amazon Bedrock evaluates the risk level and recommends appropriate response actions.
+  All client requests are received by **Amazon API Gateway** (REST API)
+  and routed to a single **AWS Lambda** function running Express
+  (`serverless-http`), following a three-layer Clean Architecture:
+  Controller → Service → Repository.
 
 + **Data Layer**  
-Incident information is stored in **Amazon DynamoDB**, while original images and related files are stored in **Amazon S3**.
-
-+ **Notification Layer**  
-If a high-risk incident is detected, the system sends email notifications through **Amazon SES** and SMS notifications through **Amazon SNS**.
+  Note data is stored in **Amazon DynamoDB** using
+  **PAY_PER_REQUEST** billing mode, with **Time-to-Live (TTL)** enabled
+  for the recycle bin feature and **Point-in-Time Recovery (PITR)** for
+  data protection. Attached images are stored in **Amazon S3** using a
+  completely private bucket and accessed through Presigned URLs.
 
 + **Monitoring Layer**  
-All logs, metrics, and alarms are managed by **Amazon CloudWatch** to support monitoring and system operations.
+  Invocation logs and distributed request traces are collected by
+  **Amazon CloudWatch** and **AWS X-Ray**, making it easier to monitor
+  and debug a serverless application without direct server access.
+
++ **Security Layer**  
+  **AWS IAM** grants Lambda only the minimum permissions required to
+  access the project's DynamoDB table and S3 bucket, following the
+  **least-privilege** principle rather than using administrator
+  privileges.
+
++ **CI/CD Layer**  
+  Every code change is automatically built, tested, and deployed to AWS
+  through **GitHub Actions**, eliminating the need to run `sam deploy`
+  manually.
 
 ---
 
 #### Deployment Architecture
 
-In this workshop, you will deploy the following components:
-
-+ **Frontend Layer**
-  + Amazon S3
-  + Amazon CloudFront
-  + Amazon Cognito
+During this workshop, you will deploy the following components:
 
 + **Application Layer**
   + Amazon API Gateway
   + AWS Lambda
 
-+ **AI Workflow**
-  + Amazon EventBridge
-  + AWS Step Functions
-  + Amazon Rekognition
-  + Amazon Bedrock
-
 + **Data Storage**
-  + Amazon DynamoDB
+  + Amazon DynamoDB (with TTL and Point-in-Time Recovery)
   + Amazon S3
 
-+ **Notification**
-  + Amazon SNS
-  + Amazon SES
++ **Frontend**
+  + Static web application served through Lambda (Express static)
 
 + **Monitoring & Security**
   + Amazon CloudWatch
-  + IAM Roles
-  + AWS Secrets Manager
+  + AWS X-Ray
+  + IAM Roles (Least Privilege)
 
-This workshop is designed to help learners become familiar with **Serverless Architecture**, **Event-Driven Architecture**, **AWS AI Services**, and the design principles of the **AWS Well-Architected Framework**.
++ **Infrastructure as Code**
+  + AWS SAM
+  + AWS CloudFormation
+
++ **CI/CD**
+  + GitHub Actions (automatic testing and deployment)
+
+This workshop is designed to help learners become familiar with
+**Serverless Architecture**, **Clean Architecture**, and the best
+practices recommended by the **AWS Well-Architected Framework**,
+especially the four pillars of **Cost Optimization**, **Security**,
+**Reliability** (through PITR), and **Operational Excellence** (through
+CI/CD).
 
 ---
 
-![Smart Campus Architecture](/images/5-Workshop/5.1/smart-campus-architecture.png)
-```
+![Smart Notes API Architecture](/images/5-Workshop/5.1/smart-notes-architecture.png)

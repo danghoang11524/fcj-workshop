@@ -1,28 +1,20 @@
 ---
-title: "Week 7 Worklog"
-date: 2024-01-01
-weight: 1
+title: "Worklog Week 7"
+date: 2026-06-15
+weight: 7
 chapter: false
 pre: " <b> 1.7. </b> "
 ---
 
-{{% notice warning %}}
-⚠️ **Note:** The information below is for reference purposes only. This is a blank template — fill in your own content here.
-{{% /notice %}}
+### Objectives:
 
-### Week 7 Objectives:
+* Enhance the Notes API with additional features.
 
-* ...
-* ...
+### Tasks:
 
-### Tasks carried out this week:
+* Implement pagination for note listings.
+* Add search functionality for notes.
 
-| Day | Task | Start Date | Completion Date | Reference Material |
-| --- | ---- | ---------- | ---------------- | ------------------- |
-|     |      |            |                   |                      |
-|     |      |            |                   |                      |
+### Results:
 
-### Week 7 Achievements:
-
-* ...
-* ...
+* Improved the API with pagination and search capabilities.

@@ -1,72 +1,84 @@
 ---
 title : "Giới thiệu"
-date : 2025-07-14
+date : 2026-07-21
 weight : 1
-chapter : true
+chapter : false
 pre : " <b> 5.1. </b> "
 ---
+Smart Notes API là hệ thống quản lý ghi chú cá nhân (notes) được xây
+dựng hoàn toàn trên nền tảng AWS Cloud theo kiến trúc **Serverless** và
+**Clean Architecture**, không cần quản lý hay vận hành bất kỳ máy chủ
+nào.
 
-# Giới thiệu về Smart Campus Guardian
+Hệ thống hỗ trợ đầy đủ các thao tác:
 
-Smart Campus Guardian là hệ thống giám sát sự cố thông minh dành cho khuôn viên trường học, được xây dựng hoàn toàn trên nền tảng AWS Cloud theo kiến trúc **Cloud Native** và **Event-Driven**.
++ Tạo, xem, sửa, xóa ghi chú (CRUD).
++ Đính kèm và xóa ảnh minh họa cho từng ghi chú.
++ Xem lại ảnh một cách an toàn thông qua URL có chữ ký tạm thời (presigned URL), không public bucket.
++ Khôi phục ghi chú vừa xóa trong vòng 3 ngày (thùng rác), tự động xóa vĩnh viễn sau đó.
++ Khôi phục toàn bộ bảng dữ liệu về một thời điểm bất kỳ trong 35 ngày gần nhất nhờ Point-in-Time Recovery (PITR), phòng trường hợp xóa/sửa nhầm ngoài ý muốn.
 
-Hệ thống sử dụng các dịch vụ AI của AWS để tự động phát hiện các sự cố như:
-
-+ Cháy hoặc khói trong khuôn viên.
-+ Người bị ngã hoặc bất động trong thời gian dài.
-+ Tụ tập đông người bất thường.
-+ Xâm nhập khu vực cấm.
-+ Camera mất kết nối.
-
-Sau khi phát hiện sự cố, hệ thống sẽ tự động phân tích mức độ nguy hiểm, lưu thông tin sự kiện, gửi cảnh báo đến bộ phận bảo vệ và hiển thị kết quả trên Dashboard theo thời gian thực.
+Toàn bộ hạ tầng được khai báo bằng **AWS SAM** (Infrastructure as Code) —
+triển khai lặp lại được, xóa sạch bằng một lệnh, không cấu hình tay trên
+Console. Quy trình build và deploy này còn được tự động hóa thêm một
+bước bằng **CI/CD**, giúp mọi thay đổi code được kiểm thử và triển khai
+lại mà không cần chạy lệnh thủ công mỗi lần.
 
 ---
 
 #### Mục tiêu của Workshop
 
-Trong workshop này, bạn sẽ triển khai một hệ thống giám sát thông minh sử dụng các dịch vụ AWS.
+Trong workshop này, bạn sẽ triển khai lại **end-to-end** một REST API
+Serverless từ đầu đến cuối. Sau khi hoàn thành workshop, bạn sẽ có thể:
 
-Sau khi hoàn thành workshop, bạn sẽ có thể:
-
-+ Triển khai Website trên Amazon S3 và CloudFront.
-+ Xây dựng API Serverless bằng Amazon API Gateway và AWS Lambda.
-+ Lưu trữ hình ảnh từ Camera trên Amazon S3.
-+ Xây dựng Workflow xử lý sự kiện bằng Amazon EventBridge và AWS Step Functions.
-+ Sử dụng Amazon Rekognition để nhận diện đối tượng trong hình ảnh.
-+ Sử dụng Amazon Bedrock để đánh giá mức độ rủi ro của sự cố.
-+ Lưu dữ liệu Incident trên Amazon DynamoDB.
-+ Gửi Email và SMS cảnh báo thông qua Amazon SES và Amazon SNS.
-+ Giám sát toàn bộ hệ thống bằng Amazon CloudWatch.
++ Xây dựng API Serverless bằng **Amazon API Gateway** và **AWS Lambda**.
++ Lưu trữ dữ liệu ghi chú trên **Amazon DynamoDB**, dùng TTL để tự động dọn dữ liệu hết hạn.
++ Bảo vệ dữ liệu ghi chú bằng **Point-in-Time Recovery (PITR)** trên DynamoDB, khôi phục được về bất kỳ thời điểm nào trong 35 ngày gần nhất.
++ Lưu trữ và bảo mật hình ảnh trên **Amazon S3** (private bucket + presigned URL).
++ Quản lý toàn bộ hạ tầng bằng **AWS SAM / AWS CloudFormation** (Infrastructure as Code).
++ Phân quyền least-privilege cho Lambda bằng **AWS IAM**.
++ Giám sát và trace request phân tán bằng **Amazon CloudWatch** và **AWS X-Ray**.
++ Kiểm thử API bằng unit test (Jest) và Postman/curl.
++ Tự động hóa build & deploy bằng **CI/CD** (GitHub Actions), loại bỏ thao tác deploy thủ công.
++ Tối ưu chi phí, áp dụng bảo mật cơ bản, và dọn dẹp tài nguyên đúng cách.
 
 ---
 
 #### Tổng quan kiến trúc hệ thống
 
-Kiến trúc Smart Campus Guardian được chia thành các thành phần chính:
+Kiến trúc Smart Notes API được chia thành các thành phần chính:
 
-+ **Frontend Layer**  
-Website được triển khai trên **Amazon S3 Static Website Hosting** và phân phối thông qua **Amazon CloudFront** nhằm tăng tốc độ truy cập và giảm độ trễ.
++ **Frontend Layer**
+  Giao diện web tĩnh (HTML/CSS/JS thuần) được phục vụ trực tiếp qua
+  **AWS Lambda** (Express serve static), gọi thẳng API cùng domain —
+  không cần dựng thêm S3 Static Website hay CloudFront cho quy mô
+  workshop này.
 
-+ **Authentication Layer**  
-Người dùng đăng nhập thông qua **Amazon Cognito**, sử dụng JWT Token để xác thực các API.
++ **Application Layer**
+  Mọi request từ client được tiếp nhận bởi **Amazon API Gateway** (REST
+  API), định tuyến toàn bộ qua một **AWS Lambda** duy nhất chạy Express
+  (serverless-http), tổ chức theo Clean Architecture 3 tầng: Controller
+  → Service → Repository.
 
-+ **Application Layer**  
-Các yêu cầu từ người dùng được tiếp nhận bởi **Amazon API Gateway** và xử lý thông qua **AWS Lambda**.
++ **Data Layer**
+  Dữ liệu ghi chú được lưu trên **Amazon DynamoDB** (chế độ
+  PAY_PER_REQUEST, có bật TTL cho tính năng thùng rác và Point-in-Time
+  Recovery để bảo vệ dữ liệu); ảnh đính kèm được lưu trên **Amazon S3**
+  (private hoàn toàn, truy cập qua presigned URL).
 
-+ **AI Processing Layer**  
-Khi Camera tải hình ảnh lên Amazon S3, sự kiện sẽ kích hoạt **Amazon EventBridge** và **AWS Step Functions** để điều phối quy trình xử lý AI.
++ **Monitoring Layer**
+  Toàn bộ log invocation và trace request được quản lý bởi **Amazon
+  CloudWatch** và **AWS X-Ray**, hỗ trợ debug hệ thống serverless không
+  có máy chủ để truy cập trực tiếp.
 
-+ **AI Analysis Layer**  
-Amazon Rekognition nhận diện đối tượng trong ảnh, sau đó Amazon Bedrock đánh giá mức độ nguy hiểm và đề xuất hành động phù hợp.
++ **Security Layer**
+  **AWS IAM** cấp quyền least-privilege cho Lambda (chỉ đúng bảng
+  DynamoDB và bucket S3 của project), không dùng quyền quản trị toàn
+  cục.
 
-+ **Data Layer**  
-Thông tin Incident được lưu trên **Amazon DynamoDB**, trong khi hình ảnh và dữ liệu gốc được lưu trên **Amazon S3**.
-
-+ **Notification Layer**  
-Nếu phát hiện sự cố có mức độ nguy hiểm cao, hệ thống sẽ gửi Email thông qua **Amazon SES** và SMS thông qua **Amazon SNS**.
-
-+ **Monitoring Layer**  
-Toàn bộ Logs, Metrics và Alarm được quản lý bởi **Amazon CloudWatch** nhằm hỗ trợ giám sát và vận hành hệ thống.
++ **CI/CD Layer**
+  Mọi thay đổi code được **GitHub Actions** tự động build, chạy unit
+  test và deploy lại lên AWS, loại bỏ thao tác `sam deploy` thủ công.
 
 ---
 
@@ -74,36 +86,29 @@ Toàn bộ Logs, Metrics và Alarm được quản lý bởi **Amazon CloudWatch
 
 Trong workshop này, bạn sẽ triển khai các thành phần sau:
 
-+ **Frontend VPC**
-  + Amazon S3
-  + Amazon CloudFront
-  + Amazon Cognito
-
 + **Application Layer**
   + Amazon API Gateway
   + AWS Lambda
-
-+ **AI Workflow**
-  + Amazon EventBridge
-  + AWS Step Functions
-  + Amazon Rekognition
-  + Amazon Bedrock
-
 + **Data Storage**
-  + Amazon DynamoDB
+  + Amazon DynamoDB (kèm TTL và Point-in-Time Recovery)
   + Amazon S3
-
-+ **Notification**
-  + Amazon SNS
-  + Amazon SES
-
++ **Frontend**
+  + Giao diện tĩnh phục vụ qua Lambda (Express static)
 + **Monitoring & Security**
   + Amazon CloudWatch
-  + IAM Roles
-  + AWS Secrets Manager
+  + AWS X-Ray
+  + IAM Roles (least-privilege)
++ **Infrastructure as Code**
+  + AWS SAM / AWS CloudFormation
++ **CI/CD**
+  + GitHub Actions (tự động test & deploy)
 
-Workshop này được xây dựng nhằm giúp người học làm quen với kiến trúc **Serverless**, **Event-Driven**, **AI Services** và các nguyên tắc thiết kế theo **AWS Well-Architected Framework**.
+Workshop này được xây dựng nhằm giúp người học làm quen với kiến trúc
+**Serverless**, nguyên tắc **Clean Architecture**, và các thực hành cơ
+bản của **AWS Well-Architected Framework** — đặc biệt là bốn trụ cột
+**Cost Optimization**, **Security**, **Reliability** (nhờ PITR) và
+**Operational Excellence** (nhờ CI/CD).
 
 ---
 
-![Smart Campus Architecture](/images/5-Workshop/5.1/smart-campus-architecture.png)
+![Smart Notes API Architecture](/images/5-Workshop/5.1/smart-notes-architecture.png)

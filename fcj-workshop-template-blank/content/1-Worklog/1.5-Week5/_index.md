@@ -1,28 +1,20 @@
 ---
-title: "Week 5 Worklog"
-date: 2024-01-01
-weight: 1
+title: "Worklog Week 5"
+date: 2026-06-01
+weight: 5
 chapter: false
 pre: " <b> 1.5. </b> "
 ---
 
-{{% notice warning %}}
-⚠️ **Note:** The information below is for reference purposes only. This is a blank template — fill in your own content here.
-{{% /notice %}}
+### Objectives:
 
-### Week 5 Objectives:
+* Implement authentication using Amazon Cognito.
 
-* ...
-* ...
+### Tasks:
 
-### Tasks carried out this week:
+* Create an Amazon Cognito User Pool.
+* Implement user registration and login.
 
-| Day | Task | Start Date | Completion Date | Reference Material |
-| --- | ---- | ---------- | ---------------- | ------------------- |
-|     |      |            |                   |                      |
-|     |      |            |                   |                      |
+### Results:
 
-### Week 5 Achievements:
-
-* ...
-* ...
+* Successfully added user authentication to the API.

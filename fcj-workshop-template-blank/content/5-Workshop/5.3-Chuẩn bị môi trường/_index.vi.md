@@ -1,155 +1,144 @@
 ---
 title : "Chuẩn bị môi trường"
-date : 2025-07-14
+date : 2026-07-21
 weight : 3
-chapter : true
+chapter : false
 pre : " <b> 5.3. </b> "
 ---
 
-# Chuẩn bị môi trường
-
 ## Giới thiệu
 
-Trước khi bắt đầu triển khai **Smart Campus Guardian – AI Campus Incident Detection Platform**, chúng ta cần chuẩn bị đầy đủ môi trường phát triển và tài khoản AWS.
-
-Chương này sẽ hướng dẫn các yêu cầu cần thiết để đảm bảo quá trình triển khai diễn ra thuận lợi trong các chương tiếp theo.
-
----
-
-# Môi trường triển khai
-
-Hình dưới đây mô tả các thành phần cần chuẩn bị trước khi triển khai Workshop.
-
-![Workshop Prerequisites](/images/5-Workshop/5.3/prerequisite.png)
+Trước khi triển khai hạ tầng, chúng ta cần chuẩn bị đầy đủ công cụ dòng
+lệnh và tài khoản AWS với quyền phù hợp. Chương này hướng dẫn cài đặt
+**AWS CLI**, **AWS SAM CLI**, **Node.js**, và tạo một **IAM User** riêng
+cho việc phát triển thay vì dùng tài khoản `root`.
 
 ---
 
-## Điều kiện
+## Yêu cầu
 
-Trước khi triển khai, hãy đảm bảo bạn đã chuẩn bị:
-
-- AWS Account
-- IAM Administrator User
-- AWS CLI
-- Visual Studio Code
-- Git
-- Node.js 20 hoặc mới hơn
-- Java 21
-- Kết nối Internet ổn định
-
-Để đảm bảo tính nhất quán trong toàn bộ Workshop, chúng ta sẽ sử dụng Region:
-
-```text
-ap-southeast-1 (Singapore)
-```
+- Tài khoản AWS đang hoạt động.
+- Node.js phiên bản **>= 22.x**.
+- AWS CLI đã cài đặt.
+- AWS SAM CLI đã cài đặt.
+- Một trình soạn thảo code (VS Code khuyến nghị).
 
 ---
 
-## Kiểm tra AWS CLI
+## Tạo IAM User cho việc phát triển
 
-Sau khi cài đặt AWS CLI, hãy kiểm tra phiên bản bằng lệnh:
+Không sử dụng Access Key của user `root` cho bất kỳ thao tác nào. Tạo
+một IAM User riêng, gắn quyền vừa đủ để triển khai project này.
+
+1. Đăng nhập **AWS Console** → vào dịch vụ **IAM**.
+2. Chọn **Users** → **Create user**.
+3. Đặt tên, ví dụ `smart-notes-dev`.
+4. Gắn các policy cần thiết (least-privilege cho việc phát triển, không phải cho Lambda runtime):
+   - `AWSCloudFormationFullAccess`
+   - Quyền tạo/xóa Lambda, API Gateway, DynamoDB, S3, IAM Role (có thể gắn tạm `PowerUserAccess` cho môi trường học tập, và siết lại khi lên production).
+5. Tạo **Access Key** cho user này (chọn use case "Command Line Interface").
+6. Lưu lại `Access Key ID` và `Secret Access Key` — đây là lần duy nhất Secret Access Key hiển thị.
+
+![Tạo IAM User](/images/5-Workshop/5.3/create-iam-user.png)
+
+---
+
+## Cài đặt và cấu hình AWS CLI
 
 ```bash
 aws --version
+aws configure
 ```
 
-Ví dụ kết quả:
+Nhập lần lượt:
 
-```text
-aws-cli/2.x.x Python/3.x Windows/64-bit
+```
+AWS Access Key ID: <access-key-vừa-tạo>
+AWS Secret Access Key: <secret-key-vừa-tạo>
+Default region name: ap-southeast-1
+Default output format: json
 ```
 
----
-
-## Kiểm tra thông tin tài khoản AWS
-
-Sau khi cấu hình AWS CLI, chạy lệnh sau để xác nhận tài khoản đang sử dụng:
+Kiểm tra cấu hình đã đúng:
 
 ```bash
 aws sts get-caller-identity
 ```
 
-Kết quả mong đợi:
+Kết quả trả về đúng `Account` và `Arn` của user `smart-notes-dev` vừa tạo
+nghĩa là cấu hình thành công.
 
-```json
-{
-  "UserId": "...",
-  "Account": "123456789012",
-  "Arn": "arn:aws:iam::123456789012:user/WorkshopAdmin"
-}
+---
+
+## Cài đặt AWS SAM CLI
+
+```bash
+# macOS
+brew tap aws/tap
+brew install aws-sam-cli
+
+# Windows
+# Tải installer .msi từ trang chính thức AWS SAM CLI và chạy theo hướng dẫn
 ```
 
-Nếu lệnh thực thi thành công, AWS CLI đã được cấu hình chính xác.
+Kiểm tra:
+
+```bash
+sam --version
+```
 
 ---
 
-## Quyền IAM yêu cầu
+## Kiểm tra Node.js
 
-Tài khoản sử dụng trong Workshop cần có quyền quản lý các dịch vụ sau:
+```bash
+node --version   # phải >= 22.0.0
+npm --version
+```
 
-- IAM
-- Amazon S3
-- Amazon CloudFront
-- Amazon Cognito
-- Amazon API Gateway
-- AWS Lambda
-- Amazon EventBridge
-- AWS Step Functions
-- Amazon Rekognition
-- Amazon Bedrock
-- Amazon DynamoDB
-- Amazon SNS
-- Amazon SES
-- Amazon CloudWatch
+Nếu chưa có Node.js 22, khuyến nghị cài qua **nvm** để dễ quản lý nhiều phiên bản:
 
-{{% notice warning %}}
-Khuyến nghị sử dụng **IAM User** hoặc **IAM Role** có quyền Administrator trong môi trường học tập. Không nên sử dụng tài khoản Root để triển khai Workshop.
-{{% /notice %}}
+```bash
+nvm install 22
+nvm use 22
+```
 
 ---
 
-## Các công cụ sử dụng
+## Lấy mã nguồn project
 
-Trong Workshop này chúng ta sẽ sử dụng:
+```bash
+git clone <repo-url> smart-notes-api
+cd smart-notes-api
+npm install
+```
 
-| Công cụ | Mục đích |
-|----------|----------|
-| AWS Management Console | Quản lý tài nguyên AWS |
-| AWS CLI | Quản lý tài nguyên bằng dòng lệnh |
-| Visual Studio Code | Phát triển mã nguồn |
-| Git | Quản lý mã nguồn |
-| Node.js | Chạy Frontend React |
-| Java 21 | Phát triển Backend |
+Cấu trúc thư mục sẽ làm việc xuyên suốt workshop:
 
----
-
-## Nội dung Workshop
-
-Sau khi hoàn tất phần chuẩn bị, chúng ta sẽ lần lượt triển khai các thành phần của hệ thống theo đúng kiến trúc đã thiết kế.
-
-Các chương tiếp theo bao gồm:
-
-1. IAM
-2. Amazon S3
-3. Amazon Cognito
-4. Amazon API Gateway
-5. AWS Lambda
-6. Amazon EventBridge
-7. AWS Step Functions
-8. Amazon Rekognition
-9. Amazon Bedrock
-10. Amazon DynamoDB
-11. Amazon SNS
-12. Amazon SES
-13. Amazon CloudWatch
-14. Dashboard
-15. Testing
-16. Cleanup
+```
+smart-notes-api/
+├── template.yaml            # AWS SAM - định nghĩa toàn bộ hạ tầng
+├── package.json
+├── src/
+│   ├── app.js                # Express app (routes, middleware)
+│   ├── lambda.js             # Entry point cho Lambda (serverless-http)
+│   ├── config/                # Cấu hình DynamoDB, S3 client
+│   ├── routes/                # Định nghĩa route Express
+│   ├── controllers/           # Nhận request, gọi service, trả response
+│   ├── services/               # Business logic (validate, retry, presign...)
+│   ├── repositories/           # Duy nhất tầng này gọi DynamoDB
+│   ├── utils/                  # Response format, error class, validation
+│   └── public/                 # Giao diện web tĩnh (index.html)
+└── tests/                      # Unit test (Jest)
+```
 
 ---
 
-## Kết quả
+## Xác nhận môi trường sẵn sàng
 
-Sau khi hoàn thành chương này, bạn đã chuẩn bị đầy đủ môi trường phát triển, tài khoản AWS và các công cụ cần thiết để bắt đầu triển khai hệ thống **Smart Campus Guardian**.
+```bash
+sam validate --lint
+```
 
-Trong chương tiếp theo, chúng ta sẽ bắt đầu cấu hình **IAM** và tạo các quyền truy cập cần thiết cho toàn bộ hệ thống.
+Nếu không có lỗi nào được báo, môi trường đã sẵn sàng để chuyển sang
+chương tiếp theo: triển khai hạ tầng bằng AWS SAM.

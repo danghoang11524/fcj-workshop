@@ -1,28 +1,20 @@
 ---
 title: "Worklog Tuần 5"
-date: 2024-01-01
-weight: 1
+date: 2026-06-01
+weight: 5
 chapter: false
 pre: " <b> 1.5. </b> "
 ---
 
-{{% notice warning %}}
-⚠️ **Lưu ý:** Đây là bản mẫu (template) trống. Hãy tự điền nội dung thực tế của bạn vào các mục bên dưới.
-{{% /notice %}}
+### Mục tiêu:
 
-### Mục tiêu Tuần 5:
+* Authentication với Cognito
 
-* ...
-* ...
+### Công việc:
 
-### Công việc thực hiện trong tuần:
+* Tạo User Pool  
+* Login/Register  
 
-| Ngày | Công việc | Ngày bắt đầu | Ngày hoàn thành | Tài liệu tham khảo |
-| ---- | --------- | ------------ | ---------------- | ------------------- |
-|      |           |              |                   |                      |
-|      |           |              |                   |                      |
+### Kết quả:
 
-### Kết quả đạt được Tuần 5:
-
-* ...
-* ...
+* API có xác thực người dùng  

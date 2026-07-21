@@ -1,108 +1,119 @@
 ---
 title : "Workshop"
-date : 2025-07-15
+date : 2026-07-21
 weight : 5
 chapter : true
 pre : "<b>5.</b>"
 ---
+
 # Workshop
 
 ## Giới thiệu
 
-Trong phần này, chúng ta sẽ triển khai hệ thống **Smart Campus Guardian – AI Campus Incident Detection Platform** trên nền tảng Amazon Web Services (AWS).
+Trong phần này, chúng ta sẽ triển khai **Smart Notes API – Nền tảng
+Quản lý Ghi chú Serverless** trên **Amazon Web Services (AWS)**.
 
-Đây là hệ thống giám sát an toàn khuôn viên trường học sử dụng kiến trúc **Cloud Native**, **Serverless**, kết hợp các dịch vụ **AI/ML** của AWS để tự động phát hiện, phân tích và cảnh báo các sự cố như cháy nổ, khói, đám đông bất thường hoặc các tình huống mất an toàn.
+Dự án này là một REST API quản lý ghi chú cá nhân (tạo, cập nhật,
+xoá, đính kèm hình ảnh, và khôi phục ghi chú đã xoá) được xây dựng
+theo kiến trúc **Cloud Native** và **Serverless** hoàn toàn. Dự án
+tuân theo mô hình **Clean Architecture** (Controller → Service →
+Repository), tách biệt rõ ràng logic nghiệp vụ khỏi các chi tiết hạ
+tầng AWS.
 
-Workshop được xây dựng theo mô hình **Event-Driven Architecture**, trong đó toàn bộ quy trình từ lúc Camera tải hình ảnh lên Amazon S3 đến khi gửi cảnh báo đều được xử lý tự động thông qua các dịch vụ AWS.
+Workshop này được xây dựng dựa trên phương pháp **Infrastructure as
+Code (IaC)** sử dụng **AWS SAM**, trong đó toàn bộ quy trình—từ việc
+tiếp nhận request của client, lưu trữ dữ liệu trong Amazon DynamoDB,
+lưu trữ hình ảnh an toàn trong Amazon S3, cho đến giám sát hệ thống
+bằng Amazon CloudWatch và AWS X-Ray—đều được định nghĩa và quản lý
+hoàn toàn bằng code mà không cần cấu hình thủ công trên AWS Console.
+
+Quy trình triển khai còn được tự động hoá hơn nữa bằng **CI/CD**,
+đảm bảo mỗi thay đổi code đều được kiểm thử và triển khai tự động mà
+không cần can thiệp thủ công.
+
+{{% notice tip %}}
+🎬 **Xem video demo toàn bộ hệ thống trước khi bắt đầu:** [Video Demo Smart Notes API](https://drive.google.com/file/d/1tQAHcoE9rRgxeoYFCjHok-B_4vdAjKIs/view?usp=sharing)
+
+💻 **Mã nguồn:** [Smart Notes API - GitHub Repository](https://github.com/danghoang11524/smart-notes-api.git)
+{{% /notice %}}
 
 ---
 
 ## Mục tiêu
 
-Sau khi hoàn thành Workshop, bạn sẽ có thể:
+Sau khi hoàn thành workshop này, bạn sẽ có thể:
 
-- Triển khai một kiến trúc Cloud Native hoàn chỉnh trên AWS.
-- Xây dựng hệ thống xử lý sự kiện theo mô hình Event-Driven.
-- Tích hợp AI Vision với Amazon Rekognition để phân tích hình ảnh.
-- Sử dụng Amazon Bedrock để đánh giá mức độ rủi ro và sinh báo cáo AI.
-- Xây dựng REST API bằng Amazon API Gateway và AWS Lambda.
-- Lưu trữ dữ liệu bằng Amazon DynamoDB.
-- Gửi cảnh báo thời gian thực bằng Amazon SNS và Amazon SES.
-- Giám sát hệ thống bằng Amazon CloudWatch.
-- Triển khai Frontend React trên Amazon S3 và CloudFront.
+- Triển khai một kiến trúc Serverless hoàn chỉnh trên AWS.
+- Xây dựng REST API bằng Amazon API Gateway và AWS Lambda theo mô hình Clean Architecture.
+- Lưu trữ dữ liệu ứng dụng trong Amazon DynamoDB và sử dụng Time-to-Live (TTL) để tự động dọn dẹp dữ liệu hết hạn.
+- Bảo vệ dữ liệu ghi chú bằng Point-in-Time Recovery (PITR), cho phép khôi phục trong vòng 35 ngày trước đó.
+- Lưu trữ và bảo mật hình ảnh bằng Amazon S3 (bucket riêng tư với Presigned URLs).
+- Quản lý toàn bộ hạ tầng bằng AWS SAM và AWS CloudFormation (Infrastructure as Code).
+- Áp dụng nguyên tắc bảo mật least-privilege bằng AWS IAM.
+- Giám sát log và distributed traces bằng Amazon CloudWatch và AWS X-Ray.
+- Kiểm thử ứng dụng bằng Jest và các request API thực tế với Postman/curl.
+- Tự động hoá quá trình build và deploy bằng CI/CD (GitHub Actions), loại bỏ việc triển khai thủ công.
+- Tối ưu chi phí và áp dụng các best practice bảo mật cơ bản.
+- Dọn dẹp tài nguyên AWS đúng cách để tránh phát sinh chi phí ngoài ý muốn.
 
 ---
 
 ## Kiến trúc hệ thống
 
-Hệ thống bao gồm các thành phần chính:
+Hệ thống bao gồm các thành phần chính sau:
 
-- Amazon S3 lưu trữ hình ảnh từ Camera.
-- Amazon EventBridge tiếp nhận sự kiện khi có ảnh mới.
-- AWS Step Functions điều phối toàn bộ AI Workflow.
-- AWS Lambda xử lý nghiệp vụ.
-- Amazon Rekognition nhận diện đối tượng trong ảnh.
-- Amazon Bedrock đánh giá mức độ nguy hiểm và sinh báo cáo AI.
-- Amazon DynamoDB lưu trữ thông tin sự cố.
-- Amazon SNS và Amazon SES gửi cảnh báo.
-- Amazon CloudWatch theo dõi và giám sát hệ thống.
-- Amazon Cognito xác thực người dùng.
-- Amazon API Gateway cung cấp API cho ứng dụng.
-- Amazon CloudFront phân phối Website toàn cầu.
+- Amazon API Gateway tiếp nhận và định tuyến các request từ client.
+- AWS Lambda (Node.js, Express + serverless-http) xử lý toàn bộ logic nghiệp vụ.
+- Amazon DynamoDB lưu trữ dữ liệu ghi chú, với Time-to-Live (TTL) được kích hoạt cho tính năng thùng rác và Point-in-Time Recovery (PITR) được kích hoạt để bảo vệ khỏi việc cập nhật hoặc xoá nhầm.
+- Amazon S3 lưu trữ hình ảnh đính kèm trong một bucket hoàn toàn riêng tư.
+- AWS IAM cấp quyền least-privilege cho Lambda.
+- Amazon CloudWatch và AWS X-Ray cung cấp khả năng ghi log và truy vết request phân tán.
+- Giao diện web tĩnh được phục vụ trực tiếp thông qua AWS Lambda mà không cần Amazon CloudFront.
+- AWS SAM và AWS CloudFormation quản lý toàn bộ hạ tầng dưới dạng code.
+- Pipeline CI/CD được vận hành bởi GitHub Actions tự động kiểm thử và triển khai lại ứng dụng mỗi khi có thay đổi code được push lên.
 
 ---
 
 ## Nội dung Workshop
 
-Workshop gồm các chương sau:
+Workshop bao gồm các chương sau:
 
 **5.1.** Giới thiệu
 
 **5.2.** Kiến trúc hệ thống
 
-**5.3.** Chuẩn bị môi trường
+**5.3.** Thiết lập môi trường
 
-**5.4.** Tạo IAM User và IAM Role
+**5.4.** Triển khai hạ tầng
 
-**5.5.** Triển khai Amazon S3
+**5.5.** Triển khai Frontend
 
-**5.6.** AI Workflow
+**5.6.** Kiểm thử và Giám sát
 
-**5.7.** Triển khai Amazon Cognito
+**5.7.** Tự động hoá triển khai CI/CD
 
-**5.8.** Triển khai Amazon API Gateway
+**5.8.** Tối ưu Chi phí và Bảo mật
 
-**5.9.** Triển khai AWS Lambda
+**5.9.** Dọn dẹp Tài nguyên
 
-**5.10.** Triển khai Amazon EventBridge
-
-**5.11.** Triển khai AWS Step Functions
-
-**5.12.** Triển khai Amazon Rekognition
-
-**5.13.** Triển khai Amazon Bedrock
-
-**5.14.** Triển khai Amazon DynamoDB
-
-**5.15.** Triển khai Amazon SNS
-
-**5.16.** Triển khai Amazon SES
-
-**5.17.** Giám sát với Amazon CloudWatch
-
-**5.18.** Dashboard và Frontend
-
-**5.19.** Kiểm thử hệ thống
-
-**5.20.** Dọn dẹp tài nguyên
-
-**5.21.** Tổng kết
+**5.10.** Kết luận
 
 ---
 
 ## Kết quả mong đợi
 
-Sau khi hoàn thành Workshop, bạn sẽ triển khai thành công một hệ thống **AI Campus Incident Detection Platform** trên AWS với đầy đủ các thành phần từ lưu trữ, xử lý AI, quản lý người dùng, API, cơ sở dữ liệu, cảnh báo và giám sát.
+Sau khi hoàn thành workshop này, bạn sẽ triển khai thành công **Smart
+Notes API** trên AWS với đầy đủ các thành phần, bao gồm REST API, cơ
+sở dữ liệu, lưu trữ hình ảnh, giám sát, bảo mật cơ bản, và một pipeline
+triển khai tự động.
 
-Kiến trúc được thiết kế theo các nguyên tắc **AWS Well-Architected Framework**, đảm bảo tính bảo mật, khả năng mở rộng, tính sẵn sàng cao và tối ưu chi phí.
+Kiến trúc này tuân theo các nguyên tắc của **AWS Well-Architected
+Framework**, đặc biệt tập trung vào bốn trụ cột chính:
 
+- **Tối ưu Chi phí** (không tốn chi phí khi không hoạt động, tự động dọn dẹp bằng TTL)
+- **Bảo mật** (IAM least-privilege, bucket Amazon S3 riêng tư với Presigned URLs)
+- **Độ tin cậy** (Point-in-Time Recovery cho Amazon DynamoDB)
+- **Vận hành xuất sắc** (kiểm thử và triển khai tự động thông qua CI/CD)
+
+Đồng thời, hệ thống vẫn duy trì khả năng mở rộng và tính sẵn sàng cao
+nhờ tận dụng kiến trúc Serverless hoàn toàn.

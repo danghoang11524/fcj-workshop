@@ -1,28 +1,20 @@
 ---
 title: "Worklog Tuần 9"
-date: 2024-01-01
-weight: 1
+date: 2026-06-29
+weight: 9
 chapter: false
 pre: " <b> 1.9. </b> "
 ---
 
-{{% notice warning %}}
-⚠️ **Lưu ý:** Đây là bản mẫu (template) trống. Hãy tự điền nội dung thực tế của bạn vào các mục bên dưới.
-{{% /notice %}}
+### Mục tiêu:
 
-### Mục tiêu Tuần 9:
+* Monitoring
 
-* ...
-* ...
+### Công việc:
 
-### Công việc thực hiện trong tuần:
+* CloudWatch logs  
+* Theo dõi lỗi  
 
-| Ngày | Công việc | Ngày bắt đầu | Ngày hoàn thành | Tài liệu tham khảo |
-| ---- | --------- | ------------ | ---------------- | ------------------- |
-|      |           |              |                   |                      |
-|      |           |              |                   |                      |
+### Kết quả:
 
-### Kết quả đạt được Tuần 9:
-
-* ...
-* ...
+* Debug hệ thống hiệu quả  

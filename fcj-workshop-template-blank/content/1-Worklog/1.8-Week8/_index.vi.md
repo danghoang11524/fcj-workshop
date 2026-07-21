@@ -1,28 +1,20 @@
 ---
 title: "Worklog Tuần 8"
-date: 2024-01-01
-weight: 1
+date: 2026-06-22
+weight: 8
 chapter: false
 pre: " <b> 1.8. </b> "
 ---
 
-{{% notice warning %}}
-⚠️ **Lưu ý:** Đây là bản mẫu (template) trống. Hãy tự điền nội dung thực tế của bạn vào các mục bên dưới.
-{{% /notice %}}
+### Mục tiêu:
 
-### Mục tiêu Tuần 8:
+* Deploy hệ thống
 
-* ...
-* ...
+### Công việc:
 
-### Công việc thực hiện trong tuần:
+* CI/CD với GitHub  
+* Deploy API  
 
-| Ngày | Công việc | Ngày bắt đầu | Ngày hoàn thành | Tài liệu tham khảo |
-| ---- | --------- | ------------ | ---------------- | ------------------- |
-|      |           |              |                   |                      |
-|      |           |              |                   |                      |
+### Kết quả:
 
-### Kết quả đạt được Tuần 8:
-
-* ...
-* ...
+* API chạy online  

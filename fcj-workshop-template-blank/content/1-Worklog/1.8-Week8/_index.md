@@ -1,28 +1,20 @@
 ---
-title: "Week 8 Worklog"
-date: 2024-01-01
-weight: 1
+title: "Worklog Week 8"
+date: 2026-06-22
+weight: 8
 chapter: false
 pre: " <b> 1.8. </b> "
 ---
 
-{{% notice warning %}}
-⚠️ **Note:** The information below is for reference purposes only. This is a blank template — fill in your own content here.
-{{% /notice %}}
+### Objectives:
 
-### Week 8 Objectives:
+* Deploy the Smart Notes API to AWS.
 
-* ...
-* ...
+### Tasks:
 
-### Tasks carried out this week:
+* Configure a CI/CD pipeline with GitHub.
+* Deploy the API to AWS.
 
-| Day | Task | Start Date | Completion Date | Reference Material |
-| --- | ---- | ---------- | ---------------- | ------------------- |
-|     |      |            |                   |                      |
-|     |      |            |                   |                      |
+### Results:
 
-### Week 8 Achievements:
-
-* ...
-* ...
+* Successfully deployed the API and made it accessible online.

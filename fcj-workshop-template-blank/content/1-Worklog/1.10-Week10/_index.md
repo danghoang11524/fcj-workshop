@@ -1,28 +1,20 @@
 ---
-title: "Week 10 Worklog"
-date: 2024-01-01
-weight: 2
+title: "Worklog Week 10"
+date: 2026-07-06
+weight: 10
 chapter: false
 pre: " <b> 1.10. </b> "
 ---
 
-{{% notice warning %}}
-⚠️ **Note:** The information below is for reference purposes only. This is a blank template — fill in your own content here.
-{{% /notice %}}
+### Objectives:
 
-### Week 10 Objectives:
+* Optimize the system for better performance and security.
 
-* ...
-* ...
+### Tasks:
 
-### Tasks carried out this week:
+* Optimize AWS Lambda functions.
+* Improve API security.
 
-| Day | Task | Start Date | Completion Date | Reference Material |
-| --- | ---- | ---------- | ---------------- | ------------------- |
-|     |      |            |                   |                      |
-|     |      |            |                   |                      |
+### Results:
 
-### Week 10 Achievements:
-
-* ...
-* ...
+* Enhanced system stability and overall performance.

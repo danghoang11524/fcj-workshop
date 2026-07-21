@@ -1,28 +1,20 @@
 ---
-title: "Week 11 Worklog"
-date: 2024-01-01
-weight: 2
+title: "Worklog Week 11"
+date: 2026-07-13
+weight: 11
 chapter: false
 pre: " <b> 1.11. </b> "
 ---
 
-{{% notice warning %}}
-⚠️ **Note:** The information below is for reference purposes only. This is a blank template — fill in your own content here.
-{{% /notice %}}
+### Objectives:
 
-### Week 11 Objectives:
+* Complete testing and documentation.
 
-* ...
-* ...
+### Tasks:
 
-### Tasks carried out this week:
+* Test the API.
+* Prepare project documentation.
 
-| Day | Task | Start Date | Completion Date | Reference Material |
-| --- | ---- | ---------- | ---------------- | ------------------- |
-|     |      |            |                   |                      |
-|     |      |            |                   |                      |
+### Results:
 
-### Week 11 Achievements:
-
-* ...
-* ...
+* The API is fully tested and ready for production deployment.

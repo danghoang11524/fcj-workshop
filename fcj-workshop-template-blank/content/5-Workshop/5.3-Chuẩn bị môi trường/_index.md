@@ -1,155 +1,141 @@
 ---
 title : "Environment Setup"
-date : 2025-07-14
+date : 2026-07-21
 weight : 3
-chapter : true
+chapter : false
 pre : " <b> 5.3. </b> "
 ---
 
-# Environment Setup
-
 ## Introduction
 
-Before deploying **Smart Campus Guardian – AI Campus Incident Detection Platform**, we need to prepare the development environment and AWS account.
-
-This chapter describes the prerequisites required to ensure a smooth deployment process throughout the remaining workshop chapters.
-
----
-
-# Deployment Environment
-
-The following diagram illustrates the components that must be prepared before starting the workshop deployment.
-
-![Workshop Prerequisites](/images/5-Workshop/5.3/prerequisite.png)
+Before deploying the infrastructure, we need to prepare the required command-line tools and an AWS account with the appropriate permissions. This chapter guides you through installing **AWS CLI**, **AWS SAM CLI**, **Node.js**, and creating a dedicated **IAM User** for development instead of using the `root` account.
 
 ---
 
 ## Prerequisites
 
-Before deployment, make sure you have prepared:
-
-- AWS Account
-- IAM Administrator User
-- AWS CLI
-- Visual Studio Code
-- Git
-- Node.js 20 or later
-- Java 21
-- A stable Internet connection
-
-To keep the workshop consistent, we will use the following AWS Region:
-
-```text
-ap-southeast-1 (Singapore)
-```
+- An active AWS account.
+- Node.js version **>= 22.x**.
+- AWS CLI installed.
+- AWS SAM CLI installed.
+- A code editor (Visual Studio Code is recommended).
 
 ---
 
-## Verify AWS CLI
+## Create an IAM User for Development
 
-After installing AWS CLI, verify the installation with:
+Do not use the `root` user's Access Key for any operations. Instead, create a dedicated IAM User with the minimum permissions required to deploy this project.
+
+1. Sign in to the **AWS Management Console** and open the **IAM** service.
+2. Select **Users** → **Create user**.
+3. Enter a username, for example, `smart-notes-dev`.
+4. Attach the required policies (least-privilege for development, not for the Lambda runtime):
+   - `AWSCloudFormationFullAccess`
+   - Permissions to create/delete Lambda, API Gateway, DynamoDB, S3, and IAM Roles (for learning purposes, you may temporarily attach `PowerUserAccess`, then restrict permissions before deploying to production).
+5. Create an **Access Key** for this user (choose the **Command Line Interface (CLI)** use case).
+6. Save the **Access Key ID** and **Secret Access Key**. The Secret Access Key is displayed only once.
+
+![Create IAM User](/images/5-Workshop/5.3/create-iam-user.png)
+
+---
+
+## Install and Configure AWS CLI
 
 ```bash
 aws --version
+aws configure
 ```
 
-Example output:
+Enter the following information:
 
-```text
-aws-cli/2.x.x Python/3.x Windows/64-bit
+```
+AWS Access Key ID: <your-access-key>
+AWS Secret Access Key: <your-secret-key>
+Default region name: ap-southeast-1
+Default output format: json
 ```
 
----
-
-## Verify AWS Account Configuration
-
-After configuring AWS CLI, run the following command to confirm the active AWS account:
+Verify the configuration:
 
 ```bash
 aws sts get-caller-identity
 ```
 
-Expected output:
+If the returned `Account` and `Arn` match the newly created `smart-notes-dev` IAM User, the configuration is successful.
 
-```json
-{
-  "UserId": "...",
-  "Account": "123456789012",
-  "Arn": "arn:aws:iam::123456789012:user/WorkshopAdmin"
-}
+---
+
+## Install AWS SAM CLI
+
+```bash
+# macOS
+brew tap aws/tap
+brew install aws-sam-cli
+
+# Windows
+# Download the .msi installer from the official AWS SAM CLI website
+# and follow the installation instructions.
 ```
 
-If the command succeeds, AWS CLI has been configured correctly.
+Verify the installation:
+
+```bash
+sam --version
+```
 
 ---
 
-## Required IAM Permissions
+## Verify Node.js
 
-The account used for this workshop must have permission to manage the following AWS services:
+```bash
+node --version   # must be >= 22.0.0
+npm --version
+```
 
-- IAM
-- Amazon S3
-- Amazon CloudFront
-- Amazon Cognito
-- Amazon API Gateway
-- AWS Lambda
-- Amazon EventBridge
-- AWS Step Functions
-- Amazon Rekognition
-- Amazon Bedrock
-- Amazon DynamoDB
-- Amazon SNS
-- Amazon SES
-- Amazon CloudWatch
+If Node.js 22 is not installed, it is recommended to install it using **nvm** for easier version management:
 
-{{% notice warning %}}
-It is recommended to use an **IAM User** or **IAM Role** with Administrator permissions in a learning environment. Do not use the AWS Root account to deploy this workshop.
-{{% /notice %}}
+```bash
+nvm install 22
+nvm use 22
+```
 
 ---
 
-## Tools Used
+## Clone the Project Repository
 
-The following tools will be used throughout the workshop:
+```bash
+git clone <repo-url> smart-notes-api
+cd smart-notes-api
+npm install
+```
 
-| Tool | Purpose |
-|----------|----------|
-| AWS Management Console | Manage AWS resources |
-| AWS CLI | Manage resources from the command line |
-| Visual Studio Code | Develop source code |
-| Git | Manage source code |
-| Node.js | Run the React frontend |
-| Java 21 | Develop backend services |
+The project structure used throughout this workshop is as follows:
 
----
-
-## Workshop Contents
-
-After completing the environment preparation, we will deploy each system component according to the designed architecture.
-
-The next chapters include:
-
-1. IAM
-2. Amazon S3
-3. Amazon Cognito
-4. Amazon API Gateway
-5. AWS Lambda
-6. Amazon EventBridge
-7. AWS Step Functions
-8. Amazon Rekognition
-9. Amazon Bedrock
-10. Amazon DynamoDB
-11. Amazon SNS
-12. Amazon SES
-13. Amazon CloudWatch
-14. Dashboard
-15. Testing
-16. Cleanup
+```text
+smart-notes-api/
+├── template.yaml            # AWS SAM template defining the entire infrastructure
+├── package.json
+├── src/
+│   ├── app.js               # Express application (routes, middleware)
+│   ├── lambda.js            # Lambda entry point (serverless-http)
+│   ├── config/              # DynamoDB and S3 client configuration
+│   ├── routes/              # Express route definitions
+│   ├── controllers/         # Handle requests and responses
+│   ├── services/            # Business logic (validation, retry, presigned URLs, etc.)
+│   ├── repositories/        # The only layer that communicates with DynamoDB
+│   ├── utils/               # Response formatting, custom errors, validation
+│   └── public/              # Static web frontend (index.html)
+└── tests/                   # Unit tests (Jest)
+```
 
 ---
 
-## Result
+## Verify the Environment
 
-After completing this chapter, you will have prepared the development environment, AWS account, and all required tools to begin deploying the **Smart Campus Guardian** system.
+Run the following command:
 
-In the next chapter, we will start by configuring **IAM** and creating the access permissions required for the entire system.
+```bash
+sam validate --lint
+```
+
+If no errors are reported, your development environment is ready, and you can proceed to the next chapter to deploy the infrastructure using AWS SAM.

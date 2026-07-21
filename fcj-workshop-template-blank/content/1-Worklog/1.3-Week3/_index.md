@@ -1,28 +1,20 @@
 ---
-title: "Week 3 Worklog"
-date: 2024-01-01
-weight: 1
+title: "Worklog Week 3"
+date: 2026-05-18
+weight: 3
 chapter: false
 pre: " <b> 1.3. </b> "
 ---
 
-{{% notice warning %}}
-⚠️ **Note:** The information below is for reference purposes only. This is a blank template — fill in your own content here.
-{{% /notice %}}
+### Objectives:
 
-### Week 3 Objectives:
+* Become familiar with AWS Lambda and Amazon API Gateway.
 
-* ...
-* ...
+### Tasks:
 
-### Tasks carried out this week:
+* Develop AWS Lambda functions.
+* Deploy APIs using Amazon API Gateway.
 
-| Day | Task | Start Date | Completion Date | Reference Material |
-| --- | ---- | ---------- | ---------------- | ------------------- |
-|     |      |            |                   |                      |
-|     |      |            |                   |                      |
+### Results:
 
-### Week 3 Achievements:
-
-* ...
-* ...
+* Successfully created and deployed the first API endpoint.

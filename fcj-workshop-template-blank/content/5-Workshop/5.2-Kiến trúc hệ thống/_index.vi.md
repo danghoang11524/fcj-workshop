@@ -1,20 +1,25 @@
 ---
 title : "Kiến trúc hệ thống"
-date : 2025-07-14
+date : 2026-07-21
 weight : 2
-chapter : true
+chapter : false
 pre : " <b> 5.2. </b> "
 ---
-
-# Kiến trúc hệ thống
-
 ## Giới thiệu
 
-Trong chương này, chúng ta sẽ tìm hiểu kiến trúc tổng thể của dự án **Smart Campus Guardian – AI Campus Incident Detection Platform**.
+Trong chương này, chúng ta sẽ tìm hiểu kiến trúc tổng thể của dự án **Smart Notes API – Serverless Notes Management Platform**.
 
-Hệ thống được xây dựng theo mô hình **Cloud Native**, kết hợp giữa **Serverless Architecture** và **Event-Driven Architecture** trên nền tảng Amazon Web Services (AWS). Kiến trúc này giúp hệ thống có khả năng mở rộng linh hoạt, giảm chi phí vận hành và tự động xử lý các sự kiện phát sinh từ Camera AI theo thời gian thực.
+Hệ thống được xây dựng theo mô hình **Cloud Native**, áp dụng **Serverless
+Architecture** kết hợp **Clean Architecture** (Controller → Service →
+Repository) trên nền tảng Amazon Web Services (AWS). Kiến trúc này giúp
+hệ thống tự động scale theo traffic, không tốn chi phí khi không có
+request (idle), và tách biệt rõ ràng giữa logic nghiệp vụ với chi tiết
+hạ tầng AWS.
 
-Toàn bộ quy trình từ khi Camera tải hình ảnh lên Amazon S3 đến khi gửi cảnh báo cho quản trị viên đều được xử lý hoàn toàn tự động thông qua các dịch vụ được quản lý (Managed Services) của AWS.
+Toàn bộ quy trình từ khi client gửi request tạo/sửa/xóa ghi chú, tới khi
+dữ liệu được lưu trên DynamoDB và ảnh được lưu an toàn trên S3, đều được
+xử lý hoàn toàn thông qua các dịch vụ được quản lý (Managed Services) của
+AWS, không có bất kỳ máy chủ nào cần vận hành hay vá lỗi thủ công.
 
 ---
 
@@ -23,176 +28,156 @@ Toàn bộ quy trình từ khi Camera tải hình ảnh lên Amazon S3 đến kh
 Kiến trúc của hệ thống được chia thành các tầng chính sau:
 
 - Frontend Layer
-- Authentication Layer
 - API Layer
-- Event Processing Layer
-- AI Analysis Layer
 - Data Layer
-- Notification Layer
+- Lifecycle Layer (thùng rác & tự động dọn dữ liệu)
 - Monitoring Layer
+- Security Layer
 
-Mỗi tầng đảm nhận một nhiệm vụ riêng biệt nhằm đảm bảo hệ thống dễ mở rộng, dễ bảo trì và đáp ứng kiến trúc Well-Architected Framework của AWS.
+Mỗi tầng đảm nhận một nhiệm vụ riêng biệt nhằm đảm bảo hệ thống dễ mở
+rộng, dễ bảo trì và đáp ứng kiến trúc Well-Architected Framework của AWS
+(đặc biệt là hai trụ cột **Cost Optimization** và **Security**).
 
 ---
 
 ## Kiến trúc triển khai
 
-Hình dưới đây mô tả toàn bộ kiến trúc của hệ thống Smart Campus Guardian trên AWS.
+Hình dưới đây mô tả toàn bộ kiến trúc của hệ thống Smart Notes API trên AWS.
 
-![System Architecture](/images/5-Workshop/5.2/5.2.1/system-architecture.png)
+![System Architecture](/images/5-Workshop/5.1/smart-notes-architecture.png)
 
 ### Mô tả kiến trúc
 
 #### Frontend Layer
 
-Giao diện người dùng được phát triển bằng **ReactJS** và triển khai trên **Amazon S3 Static Website Hosting**.
+Giao diện người dùng là một trang **HTML/CSS/JavaScript thuần**, được
+phục vụ trực tiếp bởi chính **AWS Lambda** (Express `static` middleware)
+thay vì dựng riêng Amazon S3 Static Website + CloudFront.
 
-Người dùng truy cập hệ thống thông qua **Amazon CloudFront**, giúp:
+Lựa chọn này giúp:
 
-- Tăng tốc độ truy cập toàn cầu.
-- Hỗ trợ HTTPS.
-- Giảm độ trễ.
-- Phân phối nội dung hiệu quả.
-
----
-
-#### Authentication Layer
-
-Hệ thống sử dụng **Amazon Cognito** để quản lý người dùng.
-
-Cognito chịu trách nhiệm:
-
-- Đăng ký tài khoản.
-- Đăng nhập.
-- Quản lý User Pool.
-- Cấp JWT Access Token.
-
-Sau khi xác thực thành công, người dùng sẽ sử dụng Access Token để gọi các API thông qua API Gateway.
+- Tối giản số lượng resource cần quản lý cho một API quy mô nhỏ.
+- Giao diện và API nằm cùng domain, không phát sinh vấn đề CORS phức tạp.
+- Vẫn có thể nâng cấp lên S3 + CloudFront sau này nếu traffic tăng, mà không cần đổi API phía sau.
 
 ---
 
 #### API Layer
 
-Các yêu cầu từ Dashboard sẽ được gửi đến **Amazon API Gateway**.
+Các yêu cầu từ client được gửi đến **Amazon API Gateway** (REST API).
 
 API Gateway sẽ:
 
-- Xác thực người dùng.
-- Định tuyến yêu cầu.
-- Gọi AWS Lambda Backend.
-- Ghi log hoạt động.
+- Định tuyến toàn bộ request (`/` và `/{proxy+}`) tới một **AWS Lambda** duy nhất.
+- Xử lý CORS và hỗ trợ `BinaryMediaTypes` cho việc upload ảnh (`multipart/form-data`).
+- Ghi log truy cập.
 
-Lambda Backend sẽ thực hiện các nghiệp vụ và truy xuất dữ liệu từ Amazon DynamoDB.
+Bên trong Lambda, request được xử lý bởi **Express + serverless-http**,
+tổ chức theo Clean Architecture 3 tầng:
 
----
-
-#### Event Processing Layer
-
-Khi Camera tải hình ảnh lên **Amazon S3 Image Bucket**, hệ thống sẽ tự động kích hoạt chuỗi xử lý sự kiện.
-
-Amazon EventBridge sẽ phát hiện sự kiện Object Created và kích hoạt **AWS Step Functions** để điều phối toàn bộ quy trình AI.
-
-Nhờ mô hình Event-Driven, hệ thống có thể xử lý đồng thời nhiều Camera mà không cần can thiệp thủ công.
-
----
-
-#### AI Analysis Layer
-
-Đây là thành phần quan trọng nhất của hệ thống.
-
-Sau khi Step Functions được kích hoạt:
-
-- AWS Lambda tiền xử lý hình ảnh.
-- Amazon Rekognition nhận diện đối tượng trong ảnh.
-- Amazon Bedrock phân tích kết quả nhận diện bằng AI Generative.
-
-Hệ thống có thể phát hiện các tình huống như:
-
-- Cháy (Fire)
-- Khói (Smoke)
-- Đông người (Crowd)
-- Người khả nghi
-- Phương tiện
-
-Amazon Bedrock tiếp tục đánh giá mức độ nguy hiểm, sinh báo cáo AI và đề xuất phương án xử lý.
+- **Controller** – nhận request, gọi Service, trả response theo format thống nhất.
+- **Service** – chứa toàn bộ business logic: validate input, retry S3, sinh presigned URL, tính hạn thùng rác.
+- **Repository** – tầng duy nhất được phép gọi trực tiếp Amazon DynamoDB.
 
 ---
 
 #### Data Layer
 
-Hệ thống sử dụng **Amazon DynamoDB** để lưu trữ dữ liệu.
+Hệ thống sử dụng **Amazon DynamoDB** để lưu trữ dữ liệu ghi chú.
 
-Bao gồm:
+Mỗi note gồm các thuộc tính:
 
-- Incident
-- Camera Information
-- AI Report
-- Alert History
+- `id`, `title`, `content`, `createdAt`, `updatedAt`
+- `imageUrl` (nếu có đính kèm ảnh)
+- `deletedAt`, `expiresAt` (khi note đang ở trong thùng rác)
 
-Trong khi đó Amazon S3 lưu trữ:
+Trong khi đó **Amazon S3** lưu trữ:
 
-- Hình ảnh gốc.
-- Báo cáo.
-- Dữ liệu AI Output.
+- Ảnh gốc đính kèm từng note, trong một bucket **private hoàn toàn** (chặn public access ở cả 4 cờ).
 
 ---
 
-#### Notification Layer
+#### Lifecycle Layer (Thùng rác & tự động dọn dữ liệu)
 
-Khi AI xác định sự cố có mức độ **HIGH** hoặc **CRITICAL**, hệ thống sẽ tự động gửi cảnh báo.
+Khi người dùng xóa một note, hệ thống **không xóa cứng ngay** mà chuyển
+note sang trạng thái **soft-delete**: gắn thêm `deletedAt` (hiển thị) và
+`expiresAt` (epoch giây, dùng cho DynamoDB TTL).
 
-Amazon SNS dùng để gửi thông báo tức thời.
-
-Amazon SES dùng để gửi Email cho quản trị viên.
+Người dùng có thể khôi phục note trong vòng **3 ngày**. Sau thời hạn đó,
+**DynamoDB Time To Live (TTL)** tự động xóa vĩnh viễn item — hoàn toàn
+không cần Lambda lịch (cron) hay Step Functions điều phối, giảm cả độ
+phức tạp lẫn chi phí vận hành.
 
 ---
 
 #### Monitoring Layer
 
-Toàn bộ hệ thống được giám sát bằng **Amazon CloudWatch**.
+Toàn bộ hệ thống được giám sát bằng **Amazon CloudWatch** và **AWS X-Ray**.
 
 CloudWatch thu thập:
 
-- Logs
-- Metrics
-- Dashboard
-- Alarm
+- Logs của mọi lần Lambda invoke.
+- Metrics: Duration, Errors, Throttles, DynamoDB Consumed Capacity.
+- Alarm khi tỉ lệ lỗi vượt ngưỡng.
 
-Điều này giúp quản trị viên dễ dàng theo dõi hoạt động của hệ thống và xử lý sự cố.
-
----
-
-# AI Workflow
-
-Ngoài kiến trúc tổng thể, hệ thống còn sử dụng quy trình AI tự động để xử lý hình ảnh từ Camera.
-
-Quy trình này được điều phối bởi Amazon EventBridge và AWS Step Functions, sau đó kết hợp Amazon Rekognition và Amazon Bedrock để phân tích nội dung hình ảnh và đưa ra quyết định.
-
-![AI Workflow](/images/5-Workshop/5.2/5.2.2/ai-workflow.png)
+X-Ray (bật qua `Tracing: Active`) giúp trace một request đi qua từng
+tầng: API Gateway → Lambda → DynamoDB/S3, xác định chính xác điểm chậm
+hoặc điểm lỗi.
 
 ---
 
-## Luồng xử lý AI
+#### Security Layer
+
+**AWS IAM** cấp quyền theo nguyên tắc **least-privilege** cho Lambda: chỉ
+được `Get/Put/Delete` đúng bảng DynamoDB và bucket S3 của project (thông
+qua `DynamoDBCrudPolicy`/`S3CrudPolicy` của SAM), không có quyền quản trị
+toàn cục.
+
+Ảnh trong S3 không bao giờ có URL public tĩnh — mọi lượt xem đều đi qua
+**presigned URL** có hạn 15 phút, được Lambda ký bằng chính quyền IAM của
+nó.
+
+---
+
+# Vòng đời của một Note (Note Lifecycle Workflow)
+
+Ngoài kiến trúc tổng thể, hệ thống còn có một quy trình tự động đáng chú
+ý: vòng đời của note từ lúc tạo, chỉnh sửa, đính kèm ảnh, cho tới khi bị
+xóa (vào thùng rác) và cuối cùng được khôi phục hoặc tự động biến mất.
+
+Quy trình này được điều phối hoàn toàn bởi Amazon DynamoDB (item
+attributes + TTL) kết hợp AWS Lambda, không cần thêm dịch vụ điều phối
+sự kiện riêng.
+
+![Note Lifecycle Workflow](/images/5-Workshop/5.2/note-lifecycle-workflow.png)
+
+---
+
+## Luồng xử lý
 
 Quy trình xử lý của hệ thống gồm các bước sau:
 
-1. Camera tải hình ảnh lên Amazon S3.
-2. Amazon S3 phát sinh sự kiện Object Created.
-3. Amazon EventBridge phát hiện sự kiện.
-4. AWS Step Functions khởi động quy trình xử lý.
-5. AWS Lambda tiền xử lý hình ảnh.
-6. Amazon Rekognition nhận diện đối tượng.
-7. Amazon Bedrock đánh giá mức độ nguy hiểm và sinh báo cáo AI.
-8. AWS Lambda lưu kết quả vào Amazon DynamoDB.
-9. Amazon SNS gửi cảnh báo tức thời.
-10. Amazon SES gửi Email cho quản trị viên.
-11. Dashboard hiển thị thông tin sự cố thông qua API Gateway.
-12. Amazon CloudWatch ghi nhận Logs và Metrics của toàn bộ hệ thống.
+1. Client gửi `POST /notes` tạo note mới.
+2. AWS Lambda validate input (title ≤ 100 ký tự, content ≤ 5000 ký tự) và ghi vào Amazon DynamoDB.
+3. Client gửi `POST /notes/{id}/image` để đính kèm ảnh (multipart/form-data).
+4. AWS Lambda nhận file qua buffer (không ghi disk), upload lên Amazon S3, có retry tối đa 3 lần nếu lỗi tạm thời.
+5. Amazon DynamoDB được cập nhật với key ảnh vừa upload.
+6. Khi client gọi `GET /notes`, AWS Lambda đọc DynamoDB và **ký lại (presign)** từng ảnh thành URL tạm thời trước khi trả về.
+7. Khi client gọi `DELETE /notes/{id}`, note được **soft-delete**: gắn `deletedAt` và `expiresAt` (= hiện tại + 3 ngày).
+8. Note biến mất khỏi `GET /notes` nhưng vẫn xem được qua `GET /notes/trash`.
+9. Nếu người dùng gọi `POST /notes/{id}/restore` trước hạn, note được phục hồi về trạng thái active.
+10. Nếu không khôi phục, **Amazon DynamoDB TTL** tự động xóa vĩnh viễn item khi `expiresAt` tới hạn.
+11. Mọi bước trên đều được ghi log vào Amazon CloudWatch và trace bởi AWS X-Ray.
+12. Nếu tỉ lệ lỗi Lambda vượt ngưỡng, CloudWatch Alarm được kích hoạt để cảnh báo.
 
 ---
 
 ## Kết quả
 
-Sau khi hoàn thành chương này, bạn đã có cái nhìn tổng quan về kiến trúc của dự án Smart Campus Guardian và hiểu được cách các dịch vụ AWS phối hợp với nhau trong toàn bộ hệ thống.
+Sau khi hoàn thành chương này, bạn đã có cái nhìn tổng quan về kiến trúc
+của dự án Smart Notes API và hiểu được cách các dịch vụ AWS phối hợp với
+nhau trong toàn bộ hệ thống.
 
-Ở các chương tiếp theo, chúng ta sẽ lần lượt triển khai từng thành phần của kiến trúc, bắt đầu từ việc chuẩn bị môi trường, cấu hình IAM, Amazon S3 và các dịch vụ AI trên AWS.
+Ở các chương tiếp theo, chúng ta sẽ lần lượt triển khai từng thành phần
+của kiến trúc, bắt đầu từ việc chuẩn bị môi trường, cấu hình IAM, và
+triển khai hạ tầng bằng AWS SAM.

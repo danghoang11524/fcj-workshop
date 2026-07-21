@@ -1,214 +1,189 @@
 ---
 title: "Project Proposal"
-date: 2025-07-15
+date: 2026-07-21
 weight: 2
 chapter: false
 pre: " <b> 2. </b> "
 ---
+# Smart Notes API
 
-{{% notice info %}}
-📌 **This document presents the proposal for the Smart Campus Guardian – AI Campus Incident Detection Platform, deployed on Amazon Web Services (AWS).**
-{{% /notice %}}
+## Serverless Note-Taking REST API Platform
 
-# Smart Campus Guardian
-
-## AI Campus Incident Detection Platform
-
-Smart Campus Guardian is an AI-powered campus safety monitoring system built on a Cloud Native architecture using Amazon Web Services (AWS). The system automatically detects incidents such as fire, smoke, abnormal crowd gatherings, and other safety-related events from camera images, then analyzes, stores, and delivers real-time alerts.
+Smart Notes API is a RESTful note management system built entirely on Amazon Web Services (AWS) using a fully serverless architecture. The system allows users to create, view, update, and delete notes, attach images, and interact with them through a static web interface inspired by a library card catalog. It also supports user authentication and API protection at the gateway layer.
 
 ---
 
 # 1. Executive Summary
 
-Today, most educational institutions still rely on manual camera monitoring, resulting in delayed responses when incidents occur.
+Many personal note-taking solutions require users to choose between using SaaS platforms (which reduce data ownership and increase vendor dependency) or maintaining traditional servers that incur continuous infrastructure costs even when idle.
 
-The Smart Campus Guardian project leverages AWS AI and Serverless services to automate the entire incident detection and response process.
+Smart Notes API addresses this problem by adopting a **fully serverless architecture** on AWS. There are no continuously running servers, costs are incurred only when requests are processed, the system automatically scales with traffic, and all data remains under the owner's control through Amazon DynamoDB and Amazon S3.
 
-The system follows an **Event-Driven Architecture**, enabling automatic processing whenever a new image is uploaded from a camera.
+The application follows **Clean Architecture** (Controller → Service → Repository) within AWS Lambda, making the codebase easier to maintain, test, and extend.
 
 ---
 
 # 2. Problem Statement
 
-## What problem does it solve?
+## Challenges
 
-Traditional surveillance systems have several limitations:
+Traditional note management APIs commonly face several issues:
 
-- Completely dependent on human operators.
-- Difficult to detect incidents in real time.
-- No automated risk assessment.
-- No automatic alerting mechanism.
-- Difficult to scale as the number of cameras increases.
+- Servers remain running 24/7 even when there is little or no traffic.
+- Scaling infrastructure during traffic spikes is complex.
+- Infrastructure management (patching, scaling, load balancing) requires continuous maintenance.
+- Public APIs without protection are vulnerable to abuse and automated attacks.
+- Without authentication, anyone who knows the endpoint can access the API.
 
 ---
 
 ## Solution
 
-Smart Campus Guardian addresses these challenges by:
+Smart Notes API solves these challenges by using:
 
-- Cameras uploading images to Amazon S3.
-- Amazon EventBridge automatically detecting new events.
-- AWS Step Functions orchestrating the AI workflow.
-- Amazon Rekognition detecting objects in images.
-- Amazon Bedrock analyzing risk levels and generating incident reports.
-- AWS Lambda handling business logic.
-- Amazon DynamoDB storing incident data.
-- Amazon SNS and Amazon SES sending notifications.
-- A real-time dashboard displaying monitoring results.
+- Amazon API Gateway to receive all REST requests (GET/POST/PUT/DELETE).
+- AWS Lambda (Node.js, Express, serverless-http) implementing Clean Architecture.
+- Amazon DynamoDB for note storage using **PAY_PER_REQUEST** billing.
+- Amazon S3 for image storage with automatic retry during temporary upload failures.
+- Amazon API Gateway Usage Plans and API Keys to throttle requests and prevent abuse.
+- Amazon Cognito (Hosted UI with Google Sign-In) to authenticate users before accessing notes.
+- A lightweight HTML/CSS/JavaScript frontend communicating directly with the API.
 
 ---
 
 # Benefits and Return on Investment (ROI)
 
-Deploying Smart Campus Guardian provides several advantages:
+Deploying Smart Notes API using a serverless architecture provides several advantages:
 
-- Reduces incident detection time from several minutes to just a few seconds.
-- Lowers operational staffing costs.
-- Improves detection accuracy using AI.
-- Serverless architecture minimizes infrastructure costs.
-- Easily scales as additional cameras are deployed.
+- Nearly zero infrastructure cost when idle (covered by the AWS Free Tier for most development scenarios).
+- No server maintenance, operating system patching, or infrastructure management.
+- Automatic scaling according to traffic.
+- IAM Least Privilege permissions reduce security risks.
+- The architecture can be reused for many CRUD-based applications such as task managers, bookmark systems, and journals.
 
 ---
 
 # 3. Solution Architecture
 
-The solution is built using **Cloud Native**, **Serverless**, and **Event-Driven** architecture principles.
+The system follows a **Serverless** and **Clean Architecture** design.
 
-Workflow:
+System workflow:
 
+```text
+Client (Static HTML/CSS/JS)
+         │  fetch/CORS + x-api-key + Authorization (Cognito ID Token)
+         ▼
+   Amazon API Gateway (REST API)
+         │  Cognito Authorizer + Usage Plan/API Key
+         ▼
+     AWS Lambda (Express + serverless-http)
+         │  Controller → Service → Repository
+   ┌─────┴─────┐
+   ▼           ▼
+Amazon      Amazon S3
+DynamoDB    (Note Images)
+   │
+   ▼
+Amazon Cognito (User Pool + Hosted UI + Google Identity Provider)
+   │
+   ▼
+Amazon CloudWatch (Logs)
 ```
-Camera
-    │
-    ▼
-Amazon S3
-    │
-Object Created Event
-    ▼
-Amazon EventBridge
-    │
-    ▼
-AWS Step Functions
-    │
-    ▼
-AWS Lambda
-    │
- ┌──┴──────────────┐
- ▼                 ▼
-Amazon        Amazon
-Rekognition   Bedrock
-     │             │
-     └──────┬──────┘
-            ▼
-     Amazon DynamoDB
-            │
-     ┌──────┴──────┐
-     ▼             ▼
-Amazon SNS    Amazon SES
-            │
-            ▼
-      React Dashboard
-```
-
-![Architecture Diagram](/images/2-Proposal/smart-campus-architecture.png)
 
 ---
 
 # AWS Services Used
 
-- **Amazon S3**: Stores camera images.
-- **Amazon EventBridge**: Orchestrates events when new images are uploaded.
-- **AWS Step Functions**: Manages the AI workflow.
-- **AWS Lambda**: Executes serverless business logic.
-- **Amazon Rekognition**: Detects objects in images.
-- **Amazon Bedrock**: Performs AI-powered risk analysis using Generative AI.
-- **Amazon DynamoDB**: Stores incident records.
-- **Amazon Cognito**: Handles user authentication.
-- **Amazon API Gateway**: Provides REST APIs.
-- **Amazon SNS**: Sends real-time notifications.
-- **Amazon SES**: Sends email alerts.
-- **Amazon CloudWatch**: Monitors system performance and logs.
-- **Amazon CloudFront**: Delivers the web application globally.
-- **IAM**: Manages identity and access permissions.
+- **Amazon API Gateway** – Provides REST endpoints with API Keys and Cognito Authorizer.
+- **AWS Lambda** – Executes serverless business logic using Node.js 22.
+- **Amazon DynamoDB** – Stores note data using on-demand billing.
+- **Amazon S3** – Stores note images.
+- **Amazon Cognito** – Provides user authentication through email/password and Google Sign-In.
+- **Amazon CloudWatch** – Monitors application logs and system metrics.
+- **AWS IAM** – Implements Least Privilege access control.
+- **AWS SAM (CloudFormation)** – Deploys and manages infrastructure as code.
 
 ---
 
-# Component Design
+# Solution Components
 
 ### Frontend
 
-- ReactJS
-- Amazon S3
-- Amazon CloudFront
-- Amazon Cognito
+- Pure HTML/CSS/JavaScript
+- Library card catalog-inspired interface
+- Direct API communication using fetch
+- Authentication through Amazon Cognito Hosted UI
 
 ### Backend
 
 - Amazon API Gateway
-- AWS Lambda
-
-### AI Layer
-
-- Amazon Rekognition
-- Amazon Bedrock
+- AWS Lambda implementing Clean Architecture
 
 ### Data Layer
 
-- Amazon DynamoDB
+- Amazon DynamoDB (Notes table)
+- Amazon S3 (Image storage)
+
+### Authentication
+
+- Amazon Cognito User Pool
+- Hosted UI
+- Google Identity Provider
+
+### Security & Rate Limiting
+
+- API Gateway API Key
+- Usage Plan
 
 ### Monitoring
 
-- Amazon CloudWatch
-
-### Notification
-
-- Amazon SNS
-- Amazon SES
+- Amazon CloudWatch Logs
 
 ---
 
 # 4. Technical Implementation
 
-## Deployment Phases
+## Implementation Phases
 
 ### Phase 1
 
-Prepare the AWS environment.
+Design the system architecture, API endpoints, response formats, and validation rules.
 
 ### Phase 2
 
-Deploy IAM and Amazon S3.
+Configure IAM permissions, Amazon DynamoDB, and Amazon S3.
 
 ### Phase 3
 
-Deploy Amazon Cognito and Amazon API Gateway.
+Develop AWS Lambda using Clean Architecture and serverless-http.
 
 ### Phase 4
 
-Deploy AWS Lambda.
+Deploy Amazon API Gateway and test CRUD operations together with image uploads.
 
 ### Phase 5
 
-Build the AI workflow using Amazon EventBridge and AWS Step Functions.
+Develop the static frontend and integrate it with the API.
 
 ### Phase 6
 
-Integrate Amazon Rekognition and Amazon Bedrock.
+Configure API Gateway Usage Plans and API Keys.
 
 ### Phase 7
 
-Store incident data in Amazon DynamoDB.
+Integrate Amazon Cognito Hosted UI and Google Sign-In.
 
 ### Phase 8
 
-Deploy Amazon SNS, Amazon SES, and Amazon CloudWatch.
+Enable CloudWatch logging and monitoring.
 
 ### Phase 9
 
-Deploy the Dashboard.
+Implement an automated CI/CD deployment pipeline.
 
 ### Phase 10
 
-Perform end-to-end system testing.
+Perform end-to-end testing, including CRUD operations, authentication, image uploads, and security validation.
 
 ---
 
@@ -218,52 +193,48 @@ Perform end-to-end system testing.
 - AWS IAM User
 - AWS Region (ap-southeast-1)
 - AWS CLI
-- Visual Studio Code
-- Node.js
-- Python 3.12
-- ReactJS
+- AWS SAM CLI
+- Node.js 22
+- Google Cloud Console (OAuth Client for Cognito)
+- Postman
 - Git
 
 ---
 
 # 5. Timeline & Milestones
 
-| Week | Task |
-|------|------|
-| Week 1 | Design the solution architecture |
-| Week 2 | Deploy AWS infrastructure |
-| Week 3 | Develop the backend |
-| Week 4 | Build the AI workflow |
-| Week 5 | Develop the dashboard and authentication |
-| Week 6 | Test and finalize the system |
+| Phase | Status |
+|------|--------|
+| Completed | System architecture design, CRUD API, image upload, deployment |
+| Completed | Static HTML frontend development |
+| Completed | API Key and Usage Plan implementation |
+| In Progress | Amazon Cognito Hosted UI and Google Sign-In |
+| Next | CloudWatch logging guide |
+| Next | CI/CD deployment pipeline |
+| Future | Backend pagination, search, tags, and pinned notes |
 
 ---
 
-# 6. Cost Estimation
+# 6. Estimated Cost
 
-AWS Free Tier can be used for learning and testing purposes.
+The project can be developed almost entirely within the AWS Free Tier.
 
 Reference:
 
 https://calculator.aws
 
-## Estimated Infrastructure Cost
+## Estimated Monthly Cost
 
-| Service | Monthly Cost |
-|----------|--------------|
-| Amazon S3 | ~2 USD |
+| Service | Estimated Cost |
+|----------|----------------|
+| Amazon API Gateway | Free Tier |
 | AWS Lambda | Free Tier |
 | Amazon DynamoDB | Free Tier |
-| Amazon API Gateway | Free Tier |
-| Amazon EventBridge | Free Tier |
-| AWS Step Functions | Free Tier |
-| Amazon CloudWatch | ~2 USD |
-| Amazon SNS | Free Tier |
-| Amazon SES | <1 USD |
-| Amazon Rekognition | Based on the number of images processed |
-| Amazon Bedrock | Based on token usage |
+| Amazon S3 | ~1–2 USD |
+| Amazon Cognito | Free Tier (up to 50,000 MAUs) |
+| Amazon CloudWatch | ~1–2 USD |
 
-**Estimated total testing cost:** approximately **5–10 USD per month**.
+**Estimated monthly cost:** **2–5 USD**.
 
 ---
 
@@ -271,32 +242,31 @@ https://calculator.aws
 
 ## Risk Matrix
 
-| Risk | Severity |
-|------|----------|
-| AI misclassification | Medium |
-| Camera connection failure | High |
-| Increasing AI costs | Medium |
-| API overload | Low |
-| Workflow failure | Low |
+| Risk | Level |
+|------|-------|
+| API abuse before implementing security | High (mitigated by API Key and Cognito) |
+| Forgotten AWS resources generating unexpected costs | Medium |
+| Incorrect CORS or Cognito redirect configuration | Medium |
+| Accidental data deletion without soft-delete | Medium |
+| Heavy concurrent traffic | Low |
 
 ---
 
 ## Mitigation Strategy
 
-- Configure CloudWatch Alarms.
-- Enable Retry policies in Step Functions.
-- Apply the IAM Least Privilege principle.
-- Restrict API access using Amazon Cognito.
-- Use Billing Alarms to monitor AWS costs.
+- Monitor application logs with Amazon CloudWatch.
+- Apply IAM Least Privilege principles.
+- Protect APIs using API Keys, Usage Plans, and Cognito Authorizer.
+- Configure AWS Billing Alarms.
+- Remove infrastructure using `sam delete` when no longer needed.
 
 ---
 
-## Contingency Plan
+## Backup Strategy
 
-- Retry failed workflows.
-- Store logs in Amazon CloudWatch.
-- Back up critical data.
-- Automatically send alerts when workflows fail.
+- Retry failed S3 uploads automatically.
+- Store application logs in CloudWatch.
+- Restore the entire infrastructure at any time using `template.yaml` (Infrastructure as Code).
 
 ---
 
@@ -304,25 +274,22 @@ https://calculator.aws
 
 ## Technical Improvements
 
-- Build a complete Cloud Native system.
-- Implement an Event-Driven architecture.
-- Integrate AI Vision and Generative AI.
-- Reduce incident processing time to just a few seconds.
-- Fully automate the campus monitoring process.
+- A complete Serverless REST API following Clean Architecture.
+- Multi-layer security using API Keys, Usage Plans, and Cognito Authorizer.
+- Flexible authentication with email/password and Google Sign-In.
+- Infrastructure fully managed through AWS SAM.
+- Comprehensive monitoring using Amazon CloudWatch.
 
 ---
 
 ## Long-Term Value
 
-Smart Campus Guardian can be extended to support:
+The Smart Notes API architecture can easily be extended to support:
 
-- Smart Campuses
-- Smart Factories
-- Hospitals
-- Shopping Centers
-- Office Buildings
-- Industrial Parks
-- Smart Cities
+- Personal to-do list applications.
+- Bookmark management systems.
+- Personal journals with image attachments.
+- Team-based note sharing applications.
+- Any lightweight CRUD application requiring rapid deployment and low operating costs.
 
-Smart Campus Guardian is a modern Cloud Native solution that leverages AWS AI Services and Serverless Computing to build an intelligent monitoring platform that is scalable, cost-efficient, and aligned with AWS architectural best practices.
-````
+This architecture provides a lightweight, cost-effective, maintainable, and scalable serverless solution that follows AWS architectural best practices for small- to medium-sized applications.

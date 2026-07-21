@@ -1,28 +1,20 @@
 ---
-title: "Week 9 Worklog"
-date: 2024-01-01
-weight: 1
+title: "Worklog Week 9"
+date: 2026-06-29
+weight: 9
 chapter: false
 pre: " <b> 1.9. </b> "
 ---
 
-{{% notice warning %}}
-⚠️ **Note:** The information below is for reference purposes only. This is a blank template — fill in your own content here.
-{{% /notice %}}
+### Objectives:
 
-### Week 9 Objectives:
+* Monitor the system using AWS services.
 
-* ...
-* ...
+### Tasks:
 
-### Tasks carried out this week:
+* View and analyze logs with Amazon CloudWatch.
+* Monitor and troubleshoot application errors.
 
-| Day | Task | Start Date | Completion Date | Reference Material |
-| --- | ---- | ---------- | ---------------- | ------------------- |
-|     |      |            |                   |                      |
-|     |      |            |                   |                      |
+### Results:
 
-### Week 9 Achievements:
-
-* ...
-* ...
+* Improved system monitoring and debugging capabilities.

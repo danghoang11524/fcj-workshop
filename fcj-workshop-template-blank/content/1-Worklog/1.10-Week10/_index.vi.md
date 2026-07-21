@@ -1,28 +1,20 @@
 ---
 title: "Worklog Tuần 10"
-date: 2024-01-01
-weight: 2
+date: 2026-07-06
+weight: 10
 chapter: false
 pre: " <b> 1.10. </b> "
 ---
 
-{{% notice warning %}}
-⚠️ **Lưu ý:** Đây là bản mẫu (template) trống. Hãy tự điền nội dung thực tế của bạn vào các mục bên dưới.
-{{% /notice %}}
+### Mục tiêu:
 
-### Mục tiêu Tuần 10:
+* Tối ưu hệ thống
 
-* ...
-* ...
+### Công việc:
 
-### Công việc thực hiện trong tuần:
+* Tối ưu Lambda  
+* Bảo mật API  
 
-| Ngày | Công việc | Ngày bắt đầu | Ngày hoàn thành | Tài liệu tham khảo |
-| ---- | --------- | ------------ | ---------------- | ------------------- |
-|      |           |              |                   |                      |
-|      |           |              |                   |                      |
+### Kết quả:
 
-### Kết quả đạt được Tuần 10:
-
-* ...
-* ...
+* Hệ thống ổn định hơn  

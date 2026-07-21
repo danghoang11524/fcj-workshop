@@ -1,196 +1,157 @@
 ---
 title : "System Architecture"
-date : 2025-07-14
+date : 2026-07-21
 weight : 2
-chapter : true
+chapter : false
 pre : " <b> 5.2. </b> "
 ---
-
-# System Architecture
-
 ## Introduction
 
-In this chapter, we will explore the overall architecture of the **Smart Campus Guardian – AI Campus Incident Detection Platform**.
+In this chapter, we will explore the overall architecture of the **Smart Notes API – Serverless Notes Management Platform**.
 
-The system is built using a **Cloud Native** approach, combining **Serverless Architecture** and **Event-Driven Architecture** on **Amazon Web Services (AWS)**. This architecture enables the system to scale automatically, reduce operational costs, and process AI camera events in real time.
+The system is built using a **Cloud Native** approach, combining **Serverless Architecture** with **Clean Architecture** (Controller → Service → Repository) on **Amazon Web Services (AWS)**. This architecture enables automatic scaling based on traffic, incurs no compute cost when idle, and clearly separates business logic from AWS infrastructure details.
 
-The entire workflow—from uploading camera images to Amazon S3 to sending alerts to administrators—is handled automatically using AWS Managed Services.
+The entire workflow—from clients creating, updating, or deleting notes to storing data in Amazon DynamoDB and securely saving images in Amazon S3—is handled entirely by AWS managed services, eliminating the need to provision, maintain, or patch servers.
 
 ---
 
 # Overall Architecture
 
-The system architecture is divided into the following main layers:
+The system architecture is divided into the following layers:
 
 - Frontend Layer
-- Authentication Layer
 - API Layer
-- Event Processing Layer
-- AI Analysis Layer
 - Data Layer
-- Notification Layer
+- Lifecycle Layer (Recycle Bin & Automatic Data Cleanup)
 - Monitoring Layer
+- Security Layer
 
-Each layer has a dedicated responsibility, ensuring the system remains scalable, maintainable, and aligned with the AWS Well-Architected Framework.
+Each layer has a dedicated responsibility, making the system easier to maintain, scalable, and aligned with the **AWS Well-Architected Framework**, particularly the **Cost Optimization** and **Security** pillars.
 
 ---
 
 ## Deployment Architecture
 
-The figure below illustrates the complete architecture of the Smart Campus Guardian system on AWS.
+The following diagram illustrates the complete architecture of the Smart Notes API on AWS.
 
-![System Architecture](/images/5-Workshop/5.2/5.2.1/system-architecture.png)
+![System Architecture](/images/5-Workshop/5.1/smart-notes-architecture.png)
 
 ### Architecture Overview
 
 #### Frontend Layer
 
-The user interface is developed using **ReactJS** and hosted on **Amazon S3 Static Website Hosting**.
+The user interface is a simple **HTML/CSS/JavaScript** application served directly by **AWS Lambda** using Express's `static` middleware instead of deploying a separate Amazon S3 Static Website with CloudFront.
 
-Users access the application through **Amazon CloudFront**, which provides:
+This approach provides several benefits:
 
-- Global content delivery
-- HTTPS support
-- Reduced latency
-- Efficient content distribution
-
----
-
-#### Authentication Layer
-
-The system uses **Amazon Cognito** for user management and authentication.
-
-Amazon Cognito is responsible for:
-
-- User registration
-- User sign-in
-- User Pool management
-- Issuing JWT Access Tokens
-
-After successful authentication, users use the Access Token to access APIs through Amazon API Gateway.
+- Reduces the number of AWS resources required for a small API project.
+- Serves both the frontend and backend from the same domain, eliminating complex CORS configurations.
+- Can later be upgraded to Amazon S3 + CloudFront without changing the backend APIs if traffic increases.
 
 ---
 
 #### API Layer
 
-Requests from the dashboard are sent to **Amazon API Gateway**.
+Client requests are sent to **Amazon API Gateway (REST API)**.
 
 API Gateway is responsible for:
 
-- User authentication
-- Request routing
-- Invoking AWS Lambda backend functions
-- Logging API activities
+- Routing all requests (`/` and `/{proxy+}`) to a single **AWS Lambda** function.
+- Handling CORS and supporting `BinaryMediaTypes` for image uploads (`multipart/form-data`).
+- Recording access logs.
 
-The Lambda backend executes business logic and retrieves data from Amazon DynamoDB.
+Inside Lambda, requests are processed using **Express + serverless-http**, following a three-layer Clean Architecture:
 
----
-
-#### Event Processing Layer
-
-When a camera uploads an image to the **Amazon S3 Image Bucket**, the event processing pipeline is triggered automatically.
-
-Amazon EventBridge detects the **Object Created** event and starts **AWS Step Functions** to orchestrate the AI workflow.
-
-Thanks to the Event-Driven architecture, the system can process events from multiple cameras simultaneously without manual intervention.
-
----
-
-#### AI Analysis Layer
-
-This is the core component of the system.
-
-Once the Step Functions workflow is triggered:
-
-- AWS Lambda preprocesses the image.
-- Amazon Rekognition detects objects in the image.
-- Amazon Bedrock analyzes the detection results using Generative AI.
-
-The system can identify situations such as:
-
-- Fire
-- Smoke
-- Crowd
-- Suspicious Person
-- Vehicle
-
-Amazon Bedrock then evaluates the risk level, generates an AI incident report, and recommends appropriate actions.
+- **Controller** – Receives requests, invokes services, and returns standardized responses.
+- **Service** – Contains all business logic, including input validation, S3 retry logic, presigned URL generation, and recycle bin expiration calculations.
+- **Repository** – The only layer allowed to communicate directly with Amazon DynamoDB.
 
 ---
 
 #### Data Layer
 
-The system uses **Amazon DynamoDB** to store application data, including:
+The system uses **Amazon DynamoDB** to store note data.
 
-- Incident
-- Camera Information
-- AI Report
-- Alert History
+Each note contains the following attributes:
 
-Meanwhile, Amazon S3 stores:
+- `id`, `title`, `content`, `createdAt`, `updatedAt`
+- `imageUrl` (if an image is attached)
+- `deletedAt`, `expiresAt` (when the note is in the recycle bin)
 
-- Original images
-- Reports
-- AI output data
+Meanwhile, **Amazon S3** stores:
+
+- Original images attached to notes in a completely **private bucket** with all public access blocked.
 
 ---
 
-#### Notification Layer
+#### Lifecycle Layer (Recycle Bin & Automatic Cleanup)
 
-When the AI determines that an incident has a **HIGH** or **CRITICAL** risk level, the system automatically sends alerts.
+When a user deletes a note, the system **does not permanently remove it immediately**. Instead, it performs a **soft delete** by adding two attributes:
 
-Amazon SNS is used to deliver real-time notifications.
+- `deletedAt` – Indicates when the note was deleted.
+- `expiresAt` – Stores the Unix epoch timestamp used by DynamoDB TTL.
 
-Amazon SES is used to send email alerts to administrators.
+Users can restore deleted notes within **three days**. After the retention period expires, **Amazon DynamoDB Time To Live (TTL)** automatically removes the item permanently without requiring scheduled Lambda functions or AWS Step Functions, reducing both operational complexity and cost.
 
 ---
 
 #### Monitoring Layer
 
-The entire system is monitored using **Amazon CloudWatch**.
+The entire system is monitored using **Amazon CloudWatch** and **AWS X-Ray**.
 
 CloudWatch collects:
 
-- Logs
-- Metrics
-- Dashboards
-- Alarms
+- Logs for every Lambda invocation.
+- Metrics such as Duration, Errors, Throttles, and DynamoDB Consumed Capacity.
+- Alarms when the error rate exceeds a predefined threshold.
 
-This enables administrators to monitor system performance and quickly identify and troubleshoot issues.
+AWS X-Ray (enabled through `Tracing: Active`) traces requests across the system:
 
----
+API Gateway → Lambda → DynamoDB/S3
 
-# AI Workflow
-
-In addition to the overall architecture, the system includes an automated AI workflow for processing images captured by cameras.
-
-The workflow is orchestrated by Amazon EventBridge and AWS Step Functions, while Amazon Rekognition and Amazon Bedrock work together to analyze image content and make intelligent decisions.
-
-![AI Workflow](/images/5-Workshop/5.2/5.2.2/ai-workflow.png)
+This makes it easy to identify performance bottlenecks or failures.
 
 ---
 
-## AI Processing Flow
+#### Security Layer
 
-The AI processing workflow consists of the following steps:
+**AWS IAM** follows the **principle of least privilege** by granting Lambda access only to the project's DynamoDB table and S3 bucket using **SAM managed policies** (`DynamoDBCrudPolicy` and `S3CrudPolicy`).
 
-1. A camera uploads an image to Amazon S3.
-2. Amazon S3 generates an **Object Created** event.
-3. Amazon EventBridge detects the event.
-4. AWS Step Functions starts the AI processing workflow.
-5. AWS Lambda preprocesses the image.
-6. Amazon Rekognition detects objects in the image.
-7. Amazon Bedrock evaluates the risk level and generates an AI incident report.
-8. AWS Lambda stores the results in Amazon DynamoDB.
-9. Amazon SNS sends real-time notifications.
-10. Amazon SES sends email alerts to administrators.
-11. The Dashboard retrieves and displays incident information through Amazon API Gateway.
-12. Amazon CloudWatch records logs and metrics for the entire system.
+Images stored in Amazon S3 are never publicly accessible. Every image request is served through a **15-minute presigned URL** generated by Lambda using its IAM permissions.
+
+---
+
+# Note Lifecycle Workflow
+
+In addition to the overall architecture, the system includes an automated workflow that manages the lifecycle of a note—from creation, editing, and image attachment to deletion, restoration, and automatic expiration.
+
+This workflow is implemented entirely through **Amazon DynamoDB attributes and TTL** together with **AWS Lambda**, without requiring additional orchestration services.
+
+![Note Lifecycle Workflow](/images/5-Workshop/5.2/5.2.2/note-lifecycle-workflow.png)
+
+---
+
+## Processing Flow
+
+The workflow consists of the following steps:
+
+1. The client sends `POST /notes` to create a new note.
+2. AWS Lambda validates the input (`title` ≤ 100 characters, `content` ≤ 5000 characters) and stores the note in Amazon DynamoDB.
+3. The client sends `POST /notes/{id}/image` to upload an image using `multipart/form-data`.
+4. AWS Lambda receives the file in memory (without writing to disk), uploads it to Amazon S3, and retries up to three times if a temporary error occurs.
+5. Amazon DynamoDB is updated with the uploaded image key.
+6. When the client requests `GET /notes`, AWS Lambda retrieves notes from DynamoDB and generates a new **presigned URL** for each image before returning the response.
+7. When the client sends `DELETE /notes/{id}`, the note is **soft deleted** by setting `deletedAt` and `expiresAt` (current time + three days).
+8. The note disappears from `GET /notes` but remains available through `GET /notes/trash`.
+9. If the client sends `POST /notes/{id}/restore` before expiration, the note is restored to the active state.
+10. If the note is not restored, **Amazon DynamoDB TTL** automatically deletes it permanently when `expiresAt` is reached.
+11. Every step is logged in Amazon CloudWatch and traced by AWS X-Ray.
+12. If the Lambda error rate exceeds the configured threshold, a CloudWatch Alarm is triggered.
 
 ---
 
 ## Result
 
-After completing this chapter, you will have a comprehensive understanding of the Smart Campus Guardian architecture and how AWS services work together throughout the system.
+After completing this chapter, you now have an overview of the Smart Notes API architecture and understand how AWS services work together throughout the system.
 
-In the following chapters, we will deploy each architectural component step by step, beginning with environment preparation, IAM configuration, Amazon S3, and the AI services on AWS.
+In the following chapters, we will implement each architectural component step by step, starting with environment preparation, IAM configuration, and infrastructure deployment using AWS SAM.

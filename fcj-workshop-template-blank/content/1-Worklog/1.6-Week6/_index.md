@@ -1,28 +1,20 @@
 ---
-title: "Week 6 Worklog"
-date: 2024-01-01
-weight: 1
+title: "Worklog Week 6"
+date: 2026-06-08
+weight: 6
 chapter: false
 pre: " <b> 1.6. </b> "
 ---
 
-{{% notice warning %}}
-⚠️ **Note:** The information below is for reference purposes only. This is a blank template — fill in your own content here.
-{{% /notice %}}
+### Objectives:
 
-### Week 6 Objectives:
+* Integrate Amazon DynamoDB into the application.
 
-* ...
-* ...
+### Tasks:
 
-### Tasks carried out this week:
+* Design the **Notes** table.
+* Connect AWS Lambda with Amazon DynamoDB.
 
-| Day | Task | Start Date | Completion Date | Reference Material |
-| --- | ---- | ---------- | ---------------- | ------------------- |
-|     |      |            |                   |                      |
-|     |      |            |                   |                      |
+### Results:
 
-### Week 6 Achievements:
-
-* ...
-* ...
+* Successfully stored and retrieved note data using Amazon DynamoDB.

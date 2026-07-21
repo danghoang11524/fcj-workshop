@@ -1,30 +1,25 @@
 ---
 title: "Bản đề xuất"
-date: 2025-07-15
+date: 2026-07-21
 weight: 2
 chapter: false
 pre: " <b> 2. </b> "
 ---
+# Smart Notes API
 
-{{% notice info %}}
-📌 **Đây là bản đề xuất của dự án Smart Campus Guardian – AI Campus Incident Detection Platform được triển khai trên Amazon Web Services (AWS).**
-{{% /notice %}}
+## Serverless Note-Taking REST API Platform
 
-# Smart Campus Guardian
-
-## AI Campus Incident Detection Platform
-
-Smart Campus Guardian là hệ thống giám sát an toàn khuôn viên trường học sử dụng trí tuệ nhân tạo (AI) kết hợp kiến trúc Cloud Native trên Amazon Web Services (AWS). Hệ thống tự động phát hiện các sự cố như cháy, khói, đám đông bất thường hoặc các tình huống mất an toàn từ hình ảnh camera, sau đó phân tích, lưu trữ và gửi cảnh báo theo thời gian thực.
+Smart Notes API là hệ thống quản lý ghi chú (notes) dạng REST API, được xây dựng theo kiến trúc Serverless hoàn toàn trên Amazon Web Services (AWS). Hệ thống cho phép người dùng tạo, xem, sửa, xóa ghi chú và đính kèm hình ảnh, đi kèm giao diện web tĩnh phong cách "thẻ mục lục thư viện" (card catalog), có xác thực đăng nhập và bảo mật API ở tầng gateway.
 
 ---
 
 # 1. Tóm tắt tổng quan
 
-Hiện nay, phần lớn các trường học vẫn giám sát an ninh bằng cách theo dõi camera thủ công, dẫn đến việc phản ứng chậm khi xảy ra sự cố.
+Các công cụ ghi chú cá nhân đơn giản thường phải đánh đổi giữa hai lựa chọn: dùng dịch vụ SaaS có sẵn (mất kiểm soát dữ liệu, phụ thuộc nhà cung cấp) hoặc tự vận hành server truyền thống (tốn chi phí duy trì 24/7 dù ít người dùng).
 
-Dự án Smart Campus Guardian ứng dụng các dịch vụ AI và Serverless của AWS để tự động hóa toàn bộ quy trình phát hiện và xử lý sự cố.
+Dự án Smart Notes API giải quyết bài toán này bằng kiến trúc **Serverless hoàn toàn** trên AWS: không có máy chủ nào chạy thường trực, chi phí chỉ phát sinh khi có request thực tế, tự động mở rộng khi lượng truy cập tăng, và toàn quyền kiểm soát dữ liệu (DynamoDB + S3 riêng).
 
-Hệ thống hoạt động theo mô hình **Event-Driven Architecture**, giúp tự động xử lý dữ liệu ngay khi có hình ảnh mới được tải lên từ camera.
+Hệ thống áp dụng **Clean Architecture** (Controller → Service → Repository) ngay trong tầng Lambda, giúp code dễ kiểm thử (unit test) và dễ mở rộng nghiệp vụ sau này.
 
 ---
 
@@ -32,103 +27,83 @@ Hệ thống hoạt động theo mô hình **Event-Driven Architecture**, giúp 
 
 ## Vấn đề là gì?
 
-Một số hạn chế của hệ thống giám sát truyền thống:
+Một số hạn chế khi xây dựng API quản lý ghi chú theo cách truyền thống:
 
-- Phụ thuộc hoàn toàn vào nhân viên giám sát.
-- Khó phát hiện sự cố trong thời gian thực.
-- Không có hệ thống đánh giá mức độ nguy hiểm.
-- Không tự động gửi cảnh báo.
-- Khó mở rộng khi số lượng camera tăng lên.
+- Server chạy 24/7 dù phần lớn thời gian không có request, gây lãng phí chi phí.
+- Khó tự động mở rộng khi lượng người dùng tăng đột biến.
+- Quản lý hạ tầng (patching, scaling, load balancer) tốn nhiều công sức vận hành.
+- API mở công khai không có lớp bảo vệ dễ bị lạm dụng, quét tự động hoặc tấn công.
+- Không có cơ chế xác thực người dùng, ai cũng có thể gọi API nếu biết URL.
 
 ---
 
 ## Giải pháp
 
-Smart Campus Guardian giải quyết bài toán bằng cách:
+Smart Notes API giải quyết bài toán bằng cách:
 
-- Camera gửi hình ảnh lên Amazon S3.
-- Amazon EventBridge tự động phát hiện sự kiện.
-- AWS Step Functions điều phối quy trình AI.
-- Amazon Rekognition nhận diện đối tượng trong ảnh.
-- Amazon Bedrock phân tích mức độ rủi ro và tạo báo cáo.
-- AWS Lambda xử lý nghiệp vụ.
-- Amazon DynamoDB lưu trữ dữ liệu.
-- Amazon SNS và Amazon SES gửi cảnh báo.
-- Dashboard hiển thị kết quả theo thời gian thực.
+- API Gateway tiếp nhận toàn bộ request REST (GET/POST/PUT/DELETE).
+- AWS Lambda (Node.js, Express + serverless-http) xử lý nghiệp vụ theo mô hình Clean Architecture.
+- Amazon DynamoDB lưu trữ dữ liệu ghi chú (PAY_PER_REQUEST, không cần quản lý capacity).
+- Amazon S3 lưu trữ hình ảnh đính kèm ghi chú, có retry khi upload lỗi.
+- Amazon API Gateway Usage Plan + API Key giới hạn tốc độ gọi API (throttle/quota), chống lạm dụng.
+- Amazon Cognito (Hosted UI + liên kết Google) bắt buộc đăng nhập trước khi truy cập ghi chú.
+- Giao diện web tĩnh (HTML/CSS/JS thuần) gọi trực tiếp API qua fetch/CORS, không cần framework frontend.
 
 ---
 
 # Lợi ích và hiệu quả đầu tư (ROI)
 
-Việc triển khai Smart Campus Guardian mang lại nhiều lợi ích:
+Việc triển khai Smart Notes API theo kiến trúc Serverless mang lại:
 
-- Giảm thời gian phát hiện sự cố từ vài phút xuống chỉ còn vài giây.
-- Giảm chi phí nhân sự giám sát.
-- Tăng độ chính xác nhờ AI.
-- Kiến trúc Serverless giúp tối ưu chi phí vận hành.
-- Hệ thống dễ dàng mở rộng khi số lượng camera tăng.
+- Chi phí gần như bằng 0 khi không có traffic (Free Tier bao phủ phần lớn dịch vụ).
+- Không cần quản lý, vá lỗi hay nâng cấp máy chủ.
+- Tự động mở rộng khi số lượng người dùng/request tăng mà không cần cấu hình thêm.
+- IAM Least Privilege: mỗi Lambda chỉ có đúng quyền cần thiết lên DynamoDB/S3, giảm rủi ro bảo mật.
+- Có thể tái sử dụng kiến trúc này cho các API CRUD khác trong tương lai (to-do list, bookmark, v.v.).
 
 ---
 
 # 3. Kiến trúc giải pháp
 
-Kiến trúc được xây dựng theo mô hình **Cloud Native**, **Serverless** và **Event-Driven**.
+Kiến trúc được xây dựng theo mô hình **Serverless** và **Clean Architecture**.
 
 Luồng hoạt động:
 
 ```
-Camera
-    │
-    ▼
-Amazon S3
-    │
-Object Created Event
-    ▼
-Amazon EventBridge
-    │
-    ▼
-AWS Step Functions
-    │
-    ▼
-AWS Lambda
-    │
- ┌──┴──────────────┐
- ▼                 ▼
-Amazon        Amazon
-Rekognition   Bedrock
-     │             │
-     └──────┬──────┘
-            ▼
-     Amazon DynamoDB
-            │
-     ┌──────┴──────┐
-     ▼             ▼
-Amazon SNS    Amazon SES
-            │
-            ▼
-      React Dashboard
+Client (Web tĩnh: HTML/CSS/JS)
+         │  fetch/CORS + x-api-key + Authorization (Cognito ID Token)
+         ▼
+   Amazon API Gateway (REST API)
+         │  Cognito Authorizer (bắt buộc đăng nhập) + Usage Plan/API Key
+         ▼
+     AWS Lambda (Express + serverless-http)
+         │  Controller → Service → Repository
+   ┌─────┴─────┐
+   ▼           ▼
+Amazon      Amazon S3
+DynamoDB    (ảnh ghi chú)
+   │
+   ▼
+Amazon Cognito (User Pool + Hosted UI + Google Identity Provider)
+   │
+   ▼
+Amazon CloudWatch (Logs)
 ```
-
-![Sơ đồ kiến trúc](/images/2-Proposal/smart-campus-architecture.png)
 
 ---
 
 # Các dịch vụ AWS sử dụng
 
-- **Amazon S3**: Lưu trữ hình ảnh từ Camera.
-- **Amazon EventBridge**: Điều phối sự kiện khi có ảnh mới.
-- **AWS Step Functions**: Điều phối AI Workflow.
-- **AWS Lambda**: Xử lý nghiệp vụ Serverless.
-- **Amazon Rekognition**: Phát hiện đối tượng trong hình ảnh.
-- **Amazon Bedrock**: Phân tích mức độ nguy hiểm bằng Generative AI.
-- **Amazon DynamoDB**: Lưu trữ dữ liệu sự cố.
-- **Amazon Cognito**: Xác thực người dùng.
-- **Amazon API Gateway**: Cung cấp REST API.
-- **Amazon SNS**: Gửi cảnh báo thời gian thực.
-- **Amazon SES**: Gửi Email thông báo.
-- **Amazon CloudWatch**: Giám sát và ghi log hệ thống.
-- **Amazon CloudFront**: Phân phối Website.
-- **IAM**: Quản lý quyền truy cập.
+- **Amazon API Gateway**: Cung cấp REST API, áp Usage Plan/API Key và Cognito Authorizer.
+- **AWS Lambda**: Xử lý nghiệp vụ Serverless (Node.js 22, Express + serverless-http).
+- **Amazon DynamoDB**: Lưu trữ dữ liệu ghi chú (PAY_PER_REQUEST).
+- **Amazon S3**: Lưu trữ hình ảnh đính kèm ghi chú.
+- **Amazon Cognito**: Xác thực người dùng (đăng ký/đăng nhập email + Google), Hosted UI.
+- **Amazon CloudWatch**: Giám sát và ghi log hệ thống, tra cứu lỗi.
+- **IAM**: Quản lý quyền truy cập theo nguyên tắc Least Privilege.
+- **AWS SAM (CloudFormation)**: Infrastructure as Code, đóng gói và triển khai toàn bộ hạ tầng.
+- **Amazon DynamoDB Point-in-Time Recovery (PITR)**: Tự động sao lưu liên tục, cho phép khôi phục bảng Notes về bất kỳ thời điểm nào trong 35 ngày gần nhất.
+- **CI/CD Pipeline**: Tự động hóa build & deploy (`sam build && sam deploy`) mỗi khi có thay đổi code, giảm rủi ro deploy thủ công sai sót.
 
 ---
 
@@ -136,33 +111,32 @@ Amazon SNS    Amazon SES
 
 ### Frontend
 
-- ReactJS
-- Amazon S3
-- Amazon CloudFront
-- Amazon Cognito
+- HTML/CSS/JS thuần (1 file tĩnh, không build step)
+- Giao diện "thẻ mục lục thư viện" (Fraunces + Courier Prime, dấu "FILED")
+- Gọi trực tiếp API qua fetch, xác thực bằng Cognito Hosted UI
 
 ### Backend
 
 - Amazon API Gateway
-- AWS Lambda
-
-### AI Layer
-
-- Amazon Rekognition
-- Amazon Bedrock
+- AWS Lambda (Clean Architecture: Controller → Service → Repository)
 
 ### Data Layer
 
-- Amazon DynamoDB
+- Amazon DynamoDB (bảng Notes)
+- Amazon S3 (bucket ảnh ghi chú)
+
+### Authentication
+
+- Amazon Cognito User Pool + Hosted UI
+- Google Identity Provider (đăng nhập bằng Google)
+
+### Security & Throttling
+
+- Amazon API Gateway API Key + Usage Plan
 
 ### Monitoring
 
-- Amazon CloudWatch
-
-### Notification
-
-- Amazon SNS
-- Amazon SES
+- Amazon CloudWatch Logs
 
 ---
 
@@ -172,43 +146,47 @@ Amazon SNS    Amazon SES
 
 ### Giai đoạn 1
 
-Chuẩn bị môi trường AWS.
+Thiết kế kiến trúc & định nghĩa API (endpoints, response format, validation).
 
 ### Giai đoạn 2
 
-Triển khai IAM và Amazon S3.
+Triển khai IAM, Amazon DynamoDB và Amazon S3 (least-privilege).
 
 ### Giai đoạn 3
 
-Triển khai Amazon Cognito và API Gateway.
+Xây dựng Lambda theo Clean Architecture (Controller/Service/Repository) + serverless-http.
 
 ### Giai đoạn 4
 
-Triển khai AWS Lambda.
+Triển khai Amazon API Gateway, kiểm thử CRUD + upload/xóa ảnh qua Postman.
 
 ### Giai đoạn 5
 
-Xây dựng AI Workflow bằng EventBridge và Step Functions.
+Xây dựng Frontend HTML tĩnh, kết nối API qua fetch/CORS.
 
 ### Giai đoạn 6
 
-Tích hợp Amazon Rekognition và Amazon Bedrock.
+Bổ sung bảo mật API Key + Usage Plan (throttle/quota).
 
 ### Giai đoạn 7
 
-Lưu dữ liệu vào Amazon DynamoDB.
+Tích hợp Amazon Cognito (Hosted UI + Google Identity Provider), bắt buộc đăng nhập.
 
 ### Giai đoạn 8
 
-Triển khai SNS, SES và CloudWatch.
+Thiết lập giám sát CloudWatch Logs, hướng dẫn tra cứu lỗi.
 
 ### Giai đoạn 9
 
-Triển khai Dashboard.
+Bật Point-in-Time Recovery (PITR) cho Amazon DynamoDB, bảo vệ dữ liệu ghi chú khỏi thao tác xóa/sửa nhầm.
 
 ### Giai đoạn 10
 
-Kiểm thử toàn bộ hệ thống.
+Thiết lập CI/CD tự động triển khai (build & deploy tự động khi push code).
+
+### Giai đoạn 11
+
+Kiểm thử toàn bộ hệ thống (CRUD, upload ảnh, đăng nhập/đăng xuất, bảo mật, khôi phục PITR).
 
 ---
 
@@ -218,30 +196,32 @@ Kiểm thử toàn bộ hệ thống.
 - AWS IAM User.
 - AWS Region (ap-southeast-1).
 - AWS CLI.
-- Visual Studio Code.
-- Node.js.
-- Python 3.12.
-- ReactJS.
+- AWS SAM CLI.
+- Node.js 22.
+- Google Cloud Console (tạo OAuth Client cho Cognito).
+- Postman.
 - Git.
 
 ---
 
 # 5. Thời gian & Mốc quan trọng
 
-| Tuần | Công việc |
+| Giai đoạn | Công việc |
 |------|-----------|
-| Tuần 1 | Thiết kế kiến trúc |
-| Tuần 2 | Triển khai hạ tầng AWS |
-| Tuần 3 | Phát triển Backend |
-| Tuần 4 | Xây dựng AI Workflow |
-| Tuần 5 | Dashboard và Authentication |
-| Tuần 6 | Kiểm thử và hoàn thiện |
+| Đã hoàn thành | Thiết kế kiến trúc, xây dựng CRUD + upload ảnh, deploy thành công |
+| Đã hoàn thành | Xây dựng frontend HTML tĩnh (edit note, xem chi tiết note) |
+| Đã hoàn thành | Bảo mật API Key + Usage Plan |
+| Đã hoàn thành | Tích hợp Cognito Hosted UI + đăng nhập Google |
+| Đã hoàn thành | Bật Point-in-Time Recovery (PITR) cho DynamoDB |
+| Đã hoàn thành | Thiết lập CI/CD tự động deploy |
+| Kế tiếp | Hướng dẫn xem log CloudWatch khi lỗi |
+| Dự kiến sau | Phân trang/tìm kiếm phía backend, tags, ghim note |
 
 ---
 
 # 6. Dự toán chi phí
 
-Có thể sử dụng AWS Free Tier trong quá trình học tập và thử nghiệm.
+Có thể sử dụng AWS Free Tier trong quá trình phát triển và thử nghiệm.
 
 Tham khảo:
 
@@ -251,19 +231,14 @@ https://calculator.aws
 
 | Dịch vụ | Chi phí/tháng |
 |----------|---------------|
-| Amazon S3 | ~2 USD |
-| Lambda | Free Tier |
-| DynamoDB | Free Tier |
-| API Gateway | Free Tier |
-| EventBridge | Free Tier |
-| Step Functions | Free Tier |
-| CloudWatch | ~2 USD |
-| SNS | Free Tier |
-| SES | <1 USD |
-| Rekognition | Theo số lượng ảnh |
-| Bedrock | Theo số lượng Token |
+| Amazon API Gateway | Free Tier |
+| AWS Lambda | Free Tier |
+| Amazon DynamoDB | Free Tier |
+| Amazon S3 | ~1–2 USD |
+| Amazon Cognito | Free Tier (dưới 50,000 MAU) |
+| Amazon CloudWatch | ~1–2 USD |
 
-**Tổng chi phí thử nghiệm:** khoảng **5–10 USD/tháng**.
+**Tổng chi phí thử nghiệm:** khoảng **2–5 USD/tháng**.
 
 ---
 
@@ -273,30 +248,31 @@ https://calculator.aws
 
 | Rủi ro | Mức độ |
 |----------|---------|
-| AI nhận diện sai | Trung bình |
-| Camera mất kết nối | Cao |
-| Chi phí AI tăng | Trung bình |
-| Quá tải API | Thấp |
-| Lỗi Workflow | Thấp |
+| API bị lạm dụng/quét tự động khi chưa có bảo mật | Cao (đã giảm nhờ API Key + Cognito) |
+| Quên xóa tài nguyên AWS sau khi ngừng dùng, phát sinh phí | Trung bình |
+| Sai cấu hình CORS/redirect URI khi tích hợp Cognito + Google | Trung bình |
+| Mất dữ liệu do thao tác xóa nhầm | Trung bình (đã giảm nhờ bật PITR trên DynamoDB) |
+| Quá tải API khi nhiều người dùng cùng lúc | Thấp |
 
 ---
 
 ## Chiến lược giảm thiểu
 
-- Sử dụng CloudWatch Alarm.
-- Thiết lập Retry trong Step Functions.
-- Áp dụng IAM Least Privilege.
-- Giới hạn quyền truy cập API bằng Amazon Cognito.
-- Sử dụng Billing Alarm để theo dõi chi phí.
+- Sử dụng Amazon CloudWatch để giám sát lỗi và log.
+- Áp dụng IAM Least Privilege cho từng Lambda.
+- Giới hạn truy cập API bằng API Key + Usage Plan + Cognito Authorizer.
+- Thiết lập Billing Alarm để theo dõi chi phí phát sinh.
+- Bật Point-in-Time Recovery (PITR) trên DynamoDB để khôi phục dữ liệu khi cần.
+- Triển khai qua CI/CD tự động, hạn chế lỗi do deploy thủ công.
+- Có kế hoạch xóa toàn bộ tài nguyên (sam delete) khi ngừng sử dụng.
 
 ---
 
 ## Phương án dự phòng
 
-- Retry Workflow.
-- Lưu log trên CloudWatch.
-- Backup dữ liệu.
-- Tự động gửi cảnh báo khi Workflow thất bại.
+- Retry khi upload ảnh lên S3 thất bại (đã có sẵn trong service).
+- Lưu log lỗi trên CloudWatch để tra cứu nhanh.
+- Có thể khôi phục hạ tầng bất kỳ lúc nào từ template.yaml (Infrastructure as Code).
 
 ---
 
@@ -304,24 +280,24 @@ https://calculator.aws
 
 ## Cải tiến kỹ thuật
 
-- Xây dựng hệ thống Cloud Native hoàn chỉnh.
-- Triển khai kiến trúc Event-Driven.
-- Tích hợp AI Vision và Generative AI.
-- Giảm thời gian xử lý sự cố xuống chỉ còn vài giây.
-- Tự động hóa toàn bộ quy trình giám sát.
+- Xây dựng hoàn chỉnh REST API Serverless theo Clean Architecture.
+- Bảo mật nhiều lớp: API Key/Usage Plan + Cognito Authorizer.
+- Đăng nhập linh hoạt: email/mật khẩu hoặc Google.
+- Toàn bộ hạ tầng được quản lý bằng Infrastructure as Code (AWS SAM).
+- Có khả năng giám sát và tra cứu lỗi qua CloudWatch.
+- Dữ liệu được bảo vệ bằng Point-in-Time Recovery (PITR), khôi phục được trong 35 ngày gần nhất.
+- Quy trình triển khai tự động hóa qua CI/CD, giảm sai sót do deploy thủ công.
 
 ---
 
 ## Giá trị lâu dài
 
-Smart Campus Guardian có thể mở rộng để ứng dụng trong:
+Kiến trúc Smart Notes API có thể tái sử dụng để mở rộng cho:
 
-- Trường học thông minh (Smart Campus).
-- Nhà máy thông minh (Smart Factory).
-- Bệnh viện.
-- Trung tâm thương mại.
-- Tòa nhà văn phòng.
-- Khu công nghiệp.
-- Thành phố thông minh (Smart City).
+- Ứng dụng to-do list / task manager cá nhân.
+- Ứng dụng bookmark/lưu trữ liên kết.
+- Nhật ký cá nhân (journal) có đính kèm ảnh.
+- Nền tảng ghi chú nhóm (team notes) nếu mở rộng phân quyền theo user.
+- Bất kỳ API CRUD nhỏ nào cần triển khai nhanh, chi phí thấp trên AWS.
 
-Đây là một giải pháp Cloud Native hiện đại, tận dụng sức mạnh của AWS AI Services và Serverless Computing để xây dựng hệ thống giám sát thông minh, dễ mở rộng, tối ưu chi phí và đáp ứng các tiêu chuẩn kiến trúc của AWS.
+Đây là một giải pháp Serverless gọn nhẹ, tối ưu chi phí, dễ bảo trì và đáp ứng các tiêu chuẩn kiến trúc cơ bản của AWS cho một ứng dụng quy mô cá nhân/nhỏ.
