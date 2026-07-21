@@ -28,7 +28,7 @@ Nếu bucket có bật **Versioning**, cần kiểm tra và xóa cả các versi
 qua tab "Versions" trong S3 Console, vì lệnh `rm --recursive` mặc định
 không xóa version đã xóa (delete marker).
 
-![Xóa object trong S3 bucket](/images/5-Workshop/5.8/s3-empty-bucket.png)
+![Xóa object trong S3 bucket](/fcj-workshop/images/5-Workshop/5.8/s3-empty-bucket.png)
 
 ---
 
@@ -52,7 +52,7 @@ Nếu dùng Console thay vì CLI: **CloudFormation → chọn stack
 `smart-notes-api` → Delete**, theo dõi đến khi trạng thái chuyển thành
 `DELETE_COMPLETE`.
 
-![CloudFormation Stack Delete](/images/5-Workshop/5.8/cloudformation-delete.png)
+![CloudFormation Stack Delete](/fcj-workshop/images/5-Workshop/5.8/cloudformation-delete.png)
 
 ---
 
@@ -93,7 +93,7 @@ không có gì bị bỏ sót:
 | CloudWatch Logs | Không còn log group của function |
 | IAM | Role thực thi Lambda tự bị xóa cùng stack — không cần thao tác tay |
 
-![Checklist xác nhận đã dọn sạch](/images/5-Workshop/5.8/cleanup-checklist.png)
+![Checklist xác nhận đã dọn sạch](/fcj-workshop/images/5-Workshop/5.8/cleanup-checklist.png)
 
 ---
 

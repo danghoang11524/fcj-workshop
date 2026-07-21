@@ -48,7 +48,7 @@ chương 5.4 phần Cognito — vì đây là tham số `NoEcho`, SAM CLI sẽ k
 lưu chúng vào `samconfig.toml`, nên pipeline phải tự truyền lại mỗi lần
 deploy.
 
-![Thêm Secrets trên GitHub](/images/5-Workshop/5.7/github-secrets.png)
+![Thêm Secrets trên GitHub](/fcj-workshop/images/5-Workshop/5.7/github-secrets.png)
 
 ---
 
@@ -124,7 +124,7 @@ Push một thay đổi nhỏ (ví dụ sửa message lỗi trong `errors.js`) l�
 `main`, sau đó vào tab **Actions** trên GitHub repo để theo dõi tiến
 trình từng bước: Checkout → Install → Test → Deploy.
 
-![Pipeline chạy thành công trên GitHub Actions](/images/5-Workshop/5.7/github-actions-run.png)
+![Pipeline chạy thành công trên GitHub Actions](/fcj-workshop/images/5-Workshop/5.7/github-actions-run.png)
 
 Nếu bước `Run unit tests` báo đỏ, pipeline dừng tại đó — hạ tầng AWS
 hiện tại **không bị đụng tới**, vì bước deploy chưa từng được chạy.

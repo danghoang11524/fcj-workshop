@@ -44,7 +44,7 @@ rộng, dễ bảo trì và đáp ứng kiến trúc Well-Architected Framework 
 
 Hình dưới đây mô tả toàn bộ kiến trúc của hệ thống Smart Notes API trên AWS.
 
-![System Architecture](/images/5-Workshop/5.1/smart-notes-architecture.png)
+![System Architecture](/fcj-workshop/images/5-Workshop/5.1/smart-notes-architecture.png)
 
 ### Mô tả kiến trúc
 
@@ -149,7 +149,7 @@ Quy trình này được điều phối hoàn toàn bởi Amazon DynamoDB (item
 attributes + TTL) kết hợp AWS Lambda, không cần thêm dịch vụ điều phối
 sự kiện riêng.
 
-![Note Lifecycle Workflow](/images/5-Workshop/5.2/note-lifecycle-workflow.png)
+![Note Lifecycle Workflow](/fcj-workshop/images/5-Workshop/5.2/note-lifecycle-workflow.png)
 
 ---
 

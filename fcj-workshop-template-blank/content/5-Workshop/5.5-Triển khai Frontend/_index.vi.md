@@ -26,7 +26,7 @@ với quy mô của một API cá nhân.
 Đây là điểm có thể nâng cấp kiến trúc trong tương lai mà không cần đổi
 API phía sau — chỉ cần chuyển phần serve tĩnh sang S3 + CloudFront.
 
-![So sánh hai phương án frontend](/images/5-Workshop/5.5/frontend-options.png)
+![So sánh hai phương án frontend](/fcj-workshop/images/5-Workshop/5.5/frontend-options.png)
 
 ---
 
@@ -95,7 +95,7 @@ Kỳ vọng: `HTTP/2 200` và header `content-type: text/html`.
 
 Mở URL đó trên trình duyệt — giao diện đã có thể gọi thẳng API cùng domain.
 
-![Giao diện Smart Notes hoạt động](/images/5-Workshop/5.5/frontend-running.png)
+![Giao diện Smart Notes hoạt động](/fcj-workshop/images/5-Workshop/5.5/frontend-running.png)
 
 ---
 

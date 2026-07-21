@@ -75,7 +75,7 @@ aws dynamodb restore-table-to-point-in-time \
   --restore-date-time "2026-07-20T10:00:00Z"
 ```
 
-![PITR enabled on the Notes table](/images/5-Workshop/5.4/dynamodb-pitr-enabled.png)
+![PITR enabled on the Notes table](/fcj-workshop/images/5-Workshop/5.4/dynamodb-pitr-enabled.png)
 
 ---
 
@@ -136,7 +136,7 @@ SmartNotesFunction:
 
 As a result, the Lambda function cannot access any other AWS resources in the account, even if the application contains a security vulnerability.
 
-![Least-Privilege IAM Role](/images/5-Workshop/5.4/iam-role-policy.png)
+![Least-Privilege IAM Role](/fcj-workshop/images/5-Workshop/5.4/iam-role-policy.png)
 
 ---
 
@@ -192,7 +192,7 @@ For subsequent deployments after modifying the code, simply run:
 sam build && sam deploy
 ```
 
-![Successful deployment](/images/5-Workshop/5.4/sam-deploy-output.png)
+![Successful deployment](/fcj-workshop/images/5-Workshop/5.4/sam-deploy-output.png)
 
 ---
 

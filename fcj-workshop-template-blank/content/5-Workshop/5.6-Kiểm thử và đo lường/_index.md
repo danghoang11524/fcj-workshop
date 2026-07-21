@@ -22,7 +22,7 @@ npm test
 
 One example of a tested business rule is that the service must retry up to three times when an Amazon S3 upload encounters a temporary error, and correctly delete or retain images based on the soft-delete status. Both behaviors are verified using mocks.
 
-![Unit Test Result](/images/5-Workshop/5.6/jest-test-result.png)
+![Unit Test Result](/fcj-workshop/images/5-Workshop/5.6/jest-test-result.png)
 
 ---
 
@@ -76,7 +76,7 @@ fields @timestamp, @message
 | limit 20
 ```
 
-![CloudWatch Logs Insights](/images/5-Workshop/5.6/cloudwatch-logs-insights.png)
+![CloudWatch Logs Insights](/fcj-workshop/images/5-Workshop/5.6/cloudwatch-logs-insights.png)
 
 ---
 
@@ -86,7 +86,7 @@ Since `Tracing: Active` was enabled in `template.yaml` in Chapter 5.4, every req
 
 Open the **X-Ray Console → Service Map** to visualize the entire architecture. Any service experiencing errors will be highlighted in red. Open **Traces** to inspect individual requests and identify the slowest ones (for example, due to Amazon S3 upload retries).
 
-![AWS X-Ray Service Map](/images/5-Workshop/5.6/xray-service-map.png)
+![AWS X-Ray Service Map](/fcj-workshop/images/5-Workshop/5.6/xray-service-map.png)
 
 ---
 

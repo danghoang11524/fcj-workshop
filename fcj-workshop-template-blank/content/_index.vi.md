@@ -24,8 +24,7 @@ chapter: false
 
 &emsp; **Thời gian thực tập:** Từ 04/05/2026 đến 25/07/2026
 
-<img src="/images/avatar.png" alt="Ảnh đại diện của bạn" width="330">
-
+<img src="/fcj-workshop/images/avatar.png" alt="Ảnh đại diện của bạn" width="330">
 ### Nội dung báo cáo
 
 1.  [Nhật ký công việc](1-Worklog/)

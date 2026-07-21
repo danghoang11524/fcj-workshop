@@ -34,7 +34,7 @@ Each layer has a dedicated responsibility, making the system easier to maintain,
 
 The following diagram illustrates the complete architecture of the Smart Notes API on AWS.
 
-![System Architecture](/images/5-Workshop/5.1/smart-notes-architecture.png)
+![System Architecture](/fcj-workshop/images/5-Workshop/5.1/smart-notes-architecture.png)
 
 ### Architecture Overview
 

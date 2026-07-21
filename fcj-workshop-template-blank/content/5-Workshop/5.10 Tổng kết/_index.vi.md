@@ -47,7 +47,7 @@ Trong Workshop, chúng ta đã sử dụng các dịch vụ sau:
 
 Toàn bộ hệ thống sau khi triển khai sẽ hoạt động theo kiến trúc dưới đây.
 
-![Final Architecture](/images/5-Workshop/5.1/smart-notes-architecture.png)
+![Final Architecture](/fcj-workshop/images/5-Workshop/5.1/smart-notes-architecture.png)
 
 ---
 
@@ -148,7 +148,7 @@ Hệ thống đáp ứng đầy đủ các yêu cầu:
 
 + Giám sát và trace toàn bộ hệ thống theo thời gian thực.
 
-![Workshop Result](/images/5-Workshop/5.9/workshop-result.png)
+![Workshop Result](/fcj-workshop/images/5-Workshop/5.9/workshop-result.png)
 
 ---
 

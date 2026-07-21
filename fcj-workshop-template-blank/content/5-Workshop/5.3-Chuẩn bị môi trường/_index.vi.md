@@ -39,7 +39,7 @@ một IAM User riêng, gắn quyền vừa đủ để triển khai project này
 5. Tạo **Access Key** cho user này (chọn use case "Command Line Interface").
 6. Lưu lại `Access Key ID` và `Secret Access Key` — đây là lần duy nhất Secret Access Key hiển thị.
 
-![Tạo IAM User](/images/5-Workshop/5.3/create-iam-user.png)
+![Tạo IAM User](/fcj-workshop/images/5-Workshop/5.3/create-iam-user.png)
 
 ---
 

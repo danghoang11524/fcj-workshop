@@ -42,7 +42,7 @@ During this workshop, the following AWS services were implemented:
 
 After completing the deployment, the system architecture is shown below.
 
-![Final Architecture](/images/5-Workshop/5.1/smart-notes-architecture.png)
+![Final Architecture](/fcj-workshop/images/5-Workshop/5.1/smart-notes-architecture.png)
 
 ---
 
@@ -142,7 +142,7 @@ The system provides the following capabilities:
 
 + Monitor and trace the entire system in real time.
 
-![Workshop Result](/images/5-Workshop/5.9/5.9.2/workshop-result.png)
+![Workshop Result](/fcj-workshop/images/5-Workshop/5.9/5.9.2/workshop-result.png)
 
 ---
 

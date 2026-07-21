@@ -55,7 +55,7 @@ Chapter 5.4. Because these parameters are marked as `NoEcho`, AWS SAM
 does not save them in `samconfig.toml`, so the pipeline must provide
 them during every deployment.
 
-![Add GitHub Secrets](/images/5-Workshop/5.7/github-secrets.png)
+![Add GitHub Secrets](/fcj-workshop/images/5-Workshop/5.7/github-secrets.png)
 
 ---
 
@@ -139,7 +139,7 @@ workflow:
 
 **Checkout → Install → Test → Deploy**
 
-![Successful GitHub Actions pipeline](/images/5-Workshop/5.7/github-actions-run.png)
+![Successful GitHub Actions pipeline](/fcj-workshop/images/5-Workshop/5.7/github-actions-run.png)
 
 If the **Run unit tests** step fails, the workflow stops immediately,
 and the existing AWS infrastructure remains unchanged because the

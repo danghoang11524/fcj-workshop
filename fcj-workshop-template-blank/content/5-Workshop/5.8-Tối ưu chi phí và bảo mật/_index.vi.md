@@ -29,7 +29,7 @@ cùng, mà là những lựa chọn đã được cân nhắc xuyên suốt từ
 thống nằm trong **AWS Free Tier** (1 triệu lượt Lambda invoke/tháng,
 25GB DynamoDB storage, 5GB S3 — miễn phí 12 tháng đầu cho tài khoản mới).
 
-![Chi phí ước tính trên AWS Cost Explorer](/images/5-Workshop/5.7/cost-explorer.png)
+![Chi phí ước tính trên AWS Cost Explorer](/fcj-workshop/images/5-Workshop/5.7/cost-explorer.png)
 
 ### Thiết lập cảnh báo chi phí chủ động
 
@@ -59,7 +59,7 @@ sau 15 phút), được Lambda sinh ra bằng chính quyền IAM của nó. Kẻ
 công không thể liệt kê hay truy cập trực tiếp object trong bucket, kể cả
 khi biết chính xác tên bucket.
 
-![Bucket S3 chặn Public Access](/images/5-Workshop/5.7/s3-block-public-access.png)
+![Bucket S3 chặn Public Access](/fcj-workshop/images/5-Workshop/5.7/s3-block-public-access.png)
 
 ### Validate input ở tầng Service
 

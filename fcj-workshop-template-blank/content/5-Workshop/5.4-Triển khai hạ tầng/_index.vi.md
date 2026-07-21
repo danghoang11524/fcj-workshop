@@ -88,7 +88,7 @@ aws dynamodb restore-table-to-point-in-time \
   --restore-date-time "2026-07-20T10:00:00Z"
 ```
 
-![PITR bật trên bảng Notes](/images/5-Workshop/5.4/dynamodb-pitr-enabled.png)
+![PITR bật trên bảng Notes](/fcj-workshop/images/5-Workshop/5.4/dynamodb-pitr-enabled.png)
 
 ---
 
@@ -151,7 +151,7 @@ SAM, tự sinh ra IAM policy JSON chỉ cho phép thao tác trên đúng
 table/bucket được tham chiếu. Lambda không có quyền động vào bất kỳ tài
 nguyên AWS nào khác trong tài khoản, kể cả khi code có lỗ hổng bảo mật.
 
-![IAM Role least-privilege](/images/5-Workshop/5.4/iam-role-policy.png)
+![IAM Role least-privilege](/fcj-workshop/images/5-Workshop/5.4/iam-role-policy.png)
 
 ---
 
@@ -208,7 +208,7 @@ Từ lần deploy thứ hai trở đi (khi sửa code), chỉ cần:
 sam build && sam deploy
 ```
 
-![Kết quả deploy thành công](/images/5-Workshop/5.4/sam-deploy-output.png)
+![Kết quả deploy thành công](/fcj-workshop/images/5-Workshop/5.4/sam-deploy-output.png)
 
 ---
 

@@ -23,7 +23,7 @@ This is an intentional architectural decision that fits the scope of a lightweig
 
 The architecture can easily be upgraded in the future by moving the static website to Amazon S3 and CloudFront without modifying the backend APIs.
 
-![Frontend Deployment Options](/images/5-Workshop/5.5/frontend-options.png)
+![Frontend Deployment Options](/fcj-workshop/images/5-Workshop/5.5/frontend-options.png)
 
 ---
 
@@ -102,7 +102,7 @@ content-type: text/html
 
 Open the URL in your web browser. The frontend should now be able to communicate directly with the backend APIs using the same domain.
 
-![Smart Notes Frontend Running](/images/5-Workshop/5.5/frontend-running.png)
+![Smart Notes Frontend Running](/fcj-workshop/images/5-Workshop/5.5/frontend-running.png)
 
 ---
 

@@ -22,7 +22,7 @@ aws s3 rm s3://smart-notes-storage-<account-id>-dev --recursive
 
 If **Versioning** is enabled on the bucket, you must also delete all previous object versions from the **Versions** tab in the Amazon S3 Console, because the `rm --recursive` command does not remove deleted object versions (delete markers).
 
-![Delete Objects from the S3 Bucket](/images/5-Workshop/5.8/s3-empty-bucket.png)
+![Delete Objects from the S3 Bucket](/fcj-workshop/images/5-Workshop/5.8/s3-empty-bucket.png)
 
 ---
 
@@ -51,7 +51,7 @@ Wait until the stack status changes to:
 DELETE_COMPLETE
 ```
 
-![CloudFormation Stack Delete](/images/5-Workshop/5.8/cloudformation-delete.png)
+![CloudFormation Stack Delete](/fcj-workshop/images/5-Workshop/5.8/cloudformation-delete.png)
 
 ---
 
@@ -89,7 +89,7 @@ Verify manually in the AWS Console (Region: **ap-southeast-1**) to ensure that n
 | CloudWatch Logs | The Lambda log group no longer exists |
 | IAM | The Lambda execution role has been deleted automatically with the stack—no manual action is required |
 
-![Cleanup Checklist](/images/5-Workshop/5.8/cleanup-checklist.png)
+![Cleanup Checklist](/fcj-workshop/images/5-Workshop/5.8/cleanup-checklist.png)
 
 ---
 

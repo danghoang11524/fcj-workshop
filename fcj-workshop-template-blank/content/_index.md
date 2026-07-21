@@ -25,7 +25,7 @@ chapter: false
 
 &emsp; **Internship Period:** From May 4, 2026 to July 25, 2026
 
-<img src="/images/avatar.png" alt="Ảnh đại diện của bạn" width="330">
+<img src="/fcj-workshop/images/avatar.png" alt="Ảnh đại diện của bạn" width="330">
 
 ### Report Contents
 

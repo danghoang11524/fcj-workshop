@@ -111,4 +111,4 @@ bản của **AWS Well-Architected Framework** — đặc biệt là bốn trụ
 
 ---
 
-![Smart Notes API Architecture](/images/5-Workshop/5.1/smart-notes-architecture.png)
+![Smart Notes API Architecture](/fcj-workshop/images/5-Workshop/5.1/smart-notes-architecture.png)

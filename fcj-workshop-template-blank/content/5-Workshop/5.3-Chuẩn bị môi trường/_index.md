@@ -35,7 +35,7 @@ Do not use the `root` user's Access Key for any operations. Instead, create a de
 5. Create an **Access Key** for this user (choose the **Command Line Interface (CLI)** use case).
 6. Save the **Access Key ID** and **Secret Access Key**. The Secret Access Key is displayed only once.
 
-![Create IAM User](/images/5-Workshop/5.3/create-iam-user.png)
+![Create IAM User](/fcj-workshop/images/5-Workshop/5.3/create-iam-user.png)
 
 ---
 

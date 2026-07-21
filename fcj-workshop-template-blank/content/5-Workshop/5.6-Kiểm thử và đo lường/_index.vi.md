@@ -29,7 +29,7 @@ Ví dụ một business rule được test: service phải retry tối đa 3 l�
 upload S3 gặp lỗi tạm thời, và phải xóa/giữ ảnh đúng theo trạng thái
 soft-delete — cả hai đều được assert bằng mock.
 
-![Kết quả chạy unit test](/images/5-Workshop/5.6/jest-test-result.png)
+![Kết quả chạy unit test](/fcj-workshop/images/5-Workshop/5.6/jest-test-result.png)
 
 ---
 
@@ -87,7 +87,7 @@ fields @timestamp, @message
 | limit 20
 ```
 
-![CloudWatch Logs Insights](/images/5-Workshop/5.6/cloudwatch-logs-insights.png)
+![CloudWatch Logs Insights](/fcj-workshop/images/5-Workshop/5.6/cloudwatch-logs-insights.png)
 
 ---
 
@@ -101,7 +101,7 @@ Vào **X-Ray console → Service Map** để xem trực quan toàn bộ kiến t
 node nào đang lỗi sẽ được tô đỏ. Vào **Traces** để xem chi tiết từng
 request, phát hiện request nào chậm nhất (ví dụ do retry upload S3).
 
-![AWS X-Ray Service Map](/images/5-Workshop/5.6/xray-service-map.png)
+![AWS X-Ray Service Map](/fcj-workshop/images/5-Workshop/5.6/xray-service-map.png)
 
 ---
 
