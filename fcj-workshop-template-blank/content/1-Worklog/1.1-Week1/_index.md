@@ -9,8 +9,8 @@ pre: " <b> 1.1. </b> "
 ### Week 1 Objectives:
 
 * Become familiar with the AWS internship program.
-* Learn the fundamentals of Cloud Computing.
-
+* Learn the fundamentals of Cloud Computing..
+* 
 ### Tasks:
 
 | Day | Tasks |
