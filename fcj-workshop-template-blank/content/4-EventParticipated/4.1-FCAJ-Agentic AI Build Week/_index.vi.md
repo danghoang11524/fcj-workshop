@@ -25,14 +25,14 @@ Trong quá trình thực tập, em đã tham gia 1 events, với mỗi event là
 
 &emsp;**Một số hình ảnh trong sự kiện:**
 
-![Hình ảnh sự kiện 1](/fcj-workshop/images/4-Workshop/build-week-1.png)
+![Hình ảnh sự kiện 1](/fcj-workshop/images/4-Events/build-week-1.png)
 
-![Hình ảnh sự kiện 2](/fcj-workshop/images/4-Workshop/build-week-2.png)
+![Hình ảnh sự kiện 2](/fcj-workshop/images/4-Events/build-week-2.png)
 
-![Hình ảnh sự kiện 3](/fcj-workshop/images/4-Workshop/build-week-3.png)
+![Hình ảnh sự kiện 3](/fcj-workshop/images/4-Events/build-week-3.png)
 
-![Hình ảnh sự kiện 4](/fcj-workshop/images/4-Workshop/build-week-4.png)
+![Hình ảnh sự kiện 4](/fcj-workshop/images/4-Events/build-week-4.png)
 
-![Hình ảnh sự kiện 5](/fcj-workshop/images/4-Workshop/build-week-5.png)
+![Hình ảnh sự kiện 5](/fcj-workshop/images/4-Events/build-week-5.png)
 
-![Hình ảnh sự kiện 6](/fcj-workshop/images/4-Workshop/build-week-6.png)
+![Hình ảnh sự kiện 6](/fcj-workshop/images/4-Events/build-week-6.png)

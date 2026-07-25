@@ -25,14 +25,14 @@ During my internship, I had the opportunity to participate in an event that prov
 
 &emsp;**Event Photos:**
 
-![Event Photo 1](/fcj-workshop/images/4-Events/4.1/build-week-1.png)
+![Hình ảnh sự kiện 1](/fcj-workshop/images/4-Events/build-week-1.png)
 
-![Event Photo 2](/fcj-workshop/images/4-Events/4.1/build-week-2.png)
+![Hình ảnh sự kiện 2](/fcj-workshop/images/4-Events/build-week-2.png)
 
-![Event Photo 3](/fcj-workshop/images/4-Events/4.1/build-week-3.png)
+![Hình ảnh sự kiện 3](/fcj-workshop/images/4-Events/build-week-3.png)
 
-![Event Photo 4](/fcj-workshop/images/4-Events/4.1/build-week-4.png)
+![Hình ảnh sự kiện 4](/fcj-workshop/images/4-Events/build-week-4.png)
 
-![Event Photo 5](/fcj-workshop/images/4-Events/4.1/build-week-5.png)
+![Hình ảnh sự kiện 5](/fcj-workshop/images/4-Events/build-week-5.png)
 
-![Event Photo 6](/fcj-workshop/images/4-Events/4.1/build-week-6.png)
+![Hình ảnh sự kiện 6](/fcj-workshop/images/4-Events/build-week-6.png)
